@@ -3,7 +3,7 @@ import { Outlet, useNavigate } from "react-router-dom";
 import Footer from "./Footer";
 import "./Home.css";
 import Slider from "./Slider"; 
-import Navbar from "./Navbar";
+import Navbar from "./NavBar";
 
 export default function Home() {
   const navigate = useNavigate();
