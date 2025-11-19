@@ -54,8 +54,15 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': os.environ.get('MYSQL_DB_NAME', 'railway'),   # Tên DB trên Railway
+        'USER': os.environ.get('MYSQL_USER', 'root'),         # User trên Railway
+        'PASSWORD': os.environ.get('MYSQL_PASSWORD', 'xWoJZALVIFfDBTJRqZnxnnQLXIursKSI'),     # Password trên Railway
+        'HOST': os.environ.get('MYSQL_HOST', 'yamanote.proxy.rlwy.net'),    # Host trên Railway (thường là ...containers.railway.app)
+        'PORT': os.environ.get('MYSQL_PORT', '41722'),         # Port (chú ý: Railway thường đổi port khác 3306)
+        'OPTIONS': {
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+        },
     }
 }
 
