@@ -12,31 +12,32 @@ import {
   Box,
   Typography,
   Button,
+  Stack
 } from "@mui/material";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { deleteDoctor, getAllDoctor } from "../../services/DoctorServicce";
+import { toast } from "react-toastify";
 
-
-
-export default function DoctorList({ doctor }) {
+export default function DoctorList() {
   const navigate = useNavigate();
-
   const [doctors, setDoctors] = useState([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const getDoctors = async () => {
+
+  const fetchDoctors = async () => {
     try {
-      const response = await axios.get("http://localhost:3001/doctor/all");
-      console.log(response);
-      setDoctors(response.data.data.doctors);
+      const response = await getAllDoctor();
+      setDoctors(response.data);
     } catch (error) {
       console.log(error);
     }
   };
 
   useEffect(() => {
-    getDoctors();
+    fetchDoctors();
   }, []);
+
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -45,180 +46,102 @@ export default function DoctorList({ doctor }) {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
+
   const displayedDoctors = doctors.slice(
     page * rowsPerPage,
     page * rowsPerPage + rowsPerPage
   );
+  const handleDelete = async (id) => {
+    const response = await deleteDoctor(id);
+    if (response) {
+      toast.success(response.message)
+    }
+  }
   return (
-    <div className="Table">
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-        }}
+    <Box sx={{ padding: "20px 5%", minHeight: "100vh", background: "#f5f6fa" }}>
+      <Typography
+        variant="h4"
+        gutterBottom
+        sx={{ fontWeight: "bold", color: "#060b26", mb: 3, textAlign: "center" }}
       >
-        <Typography variant="h4"
-          component="h2"
-          gutterBottom
-          mt={2}
-          style={{ fontWeight: "bold", marginBottom: "10px", color: "#060b26" }}>
         Doctors List
       </Typography>
-        <div style={{ overflowX: "auto", width: "100%" }}>
-          <Box
-            sx={{
-              borderRadius: "10px",
-              overflow: "auto",
-              boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-              padding: "20px 10%",
-            }}
-          >
-            <TableContainer component={Paper}>
-              <Box sx={{ borderRadius: "10px", overflow: "auto" }}>
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell
-                        sx={{
-                          fontWeight: "bold",
-                          backgroundColor: "#060b26",
-                          color: "common.white",
-                        }}
-                      >
-                        Name
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          fontWeight: "bold",
-                          backgroundColor: "#060b26",
-                          color: "common.white",
-                        }}
-                      >
-                        Speciality
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          fontWeight: "bold",
-                          backgroundColor: "#060b26",
-                          color: "common.white",
-                        }}
-                      >
-                        Qualification
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          fontWeight: "bold",
-                          backgroundColor: "#060b26",
-                          color: "common.white",
-                        }}
-                      >
-                        Experience
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          fontWeight: "bold",
-                          backgroundColor: "#060b26",
-                          color: "common.white",
-                        }}
-                      >
-                        Contact Info
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          fontWeight: "bold",
-                          backgroundColor: "#060b26",
-                          color: "common.white",
-                        }}
-                      >
-                        Fees
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          fontWeight: "bold",
-                          backgroundColor: "#060b26",
-                          color: "common.white",
-                        }}
-                      >
-                      Tokens Per Day
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          fontWeight: "bold",
-                          backgroundColor: "#060b26",
-                          color: "common.white",
-                        }}
-                      > Action
-                       </TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {displayedDoctors.map((doctor) => (
-                      <TableRow
-                        key={doctor.doctorNo}
-                        sx={{
-                          "&:nth-of-type(even)": {
-                            backgroundColor: "background.default",
-                          },
-                          "&:hover": { backgroundColor: "rgba(0, 0, 0, 0.1)" },
-                        }}
-                      >
-                        <TableCell>{doctor.fullname}</TableCell>
-                        <TableCell>{doctor.Specialty}</TableCell>
-                        <TableCell>{doctor.Qualification}</TableCell>
-                        <TableCell>{doctor.Experience}</TableCell>
-                        <TableCell>{doctor.ContactInfo}</TableCell>
-                        <TableCell>{doctor.fees}</TableCell>
-                        <TableCell>{doctor.tokenPerDay}</TableCell>
-                        <TableCell>
-                          <Button
-                            variant="contained"
-                            color="error"
-                            style={{ fontSize: "10px" }}
-                            onClick={async () => {
-                              await axios.delete(
-                                "http://localhost:3001/doctor/", {
-                                params: {
-                                  doctorNo: doctor.doctorNo
-                                }
-                              }
-                              );
-                              window.location="/DoctorList"
-                            }}
 
-                          >Remove </Button>
+      <TableContainer component={Paper} sx={{ borderRadius: "12px", overflow: "hidden", boxShadow: 3 }}>
+        <Table sx={{ minWidth: 650 }}>
+          <TableHead>
+            <TableRow sx={{ backgroundColor: "#060b26" }}>
+              {["Name", "Email", "Phone", "Experience", "License", "Specialization", "Actions"].map((header) => (
+                <TableCell
+                  key={header}
+                  sx={{ color: "white", fontWeight: "bold", textAlign: "center" }}
+                >
+                  {header}
+                </TableCell>
+              ))}
+            </TableRow>
+          </TableHead>
 
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </Box>
-            </TableContainer>
-          </Box>
-        </div>
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
-          component="div"
-          count={doctors.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
-        <Button
-          variant="contained"
-          color="primary"
-          style={{ marginTop: "20px" }}
-        
-          onClick={ ()=>{
-           navigate('/admin/add-doctor')
-          }}
+          <TableBody>
+            {displayedDoctors.map((doctor) => (
+              <TableRow
+                key={doctor.doctorNo}
+                sx={{
+                  "&:nth-of-type(even)": { backgroundColor: "#f9f9f9" },
+                  "&:hover": { backgroundColor: "#e3f2fd" },
+                }}
+              >
+                <TableCell>{doctor.user.full_name}</TableCell>
+                <TableCell>{doctor.user.email}</TableCell>
+                <TableCell>{doctor.user.phone}</TableCell>
+                <TableCell>{doctor.experience_years}</TableCell>
+                <TableCell>{doctor.license_number}</TableCell>
+                <TableCell>{doctor.specialization}</TableCell>
+                <TableCell>
+                  <Stack direction="row" spacing={1} justifyContent="center">
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      size="small"
+                      onClick={() => navigate(`/admin/doctor/${doctor.id}`)}
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      variant="contained"
+                      color="error"
+                      size="small"
+                      onClick={() => {handleDelete(doctor.id)}}
+                    >
+                      Remove
+                    </Button>
+                  </Stack>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
 
-        >
-          Add Doctor
-        </Button>
-      </div>
-    </div>
+      <TablePagination
+        rowsPerPageOptions={[5, 10, 25]}
+        component="div"
+        count={doctors.length}
+        rowsPerPage={rowsPerPage}
+        page={page}
+        onPageChange={handleChangePage}
+        onRowsPerPageChange={handleChangeRowsPerPage}
+        sx={{ mt: 2 }}
+      />
+
+      <Button
+        variant="contained"
+        color="success"
+        sx={{ mt: 3, float: "right" }}
+        onClick={() => navigate("/admin/add-doctor")}
+      >
+        Add Doctor
+      </Button>
+    </Box>
   );
 }

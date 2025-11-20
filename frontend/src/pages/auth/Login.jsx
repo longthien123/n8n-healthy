@@ -13,7 +13,6 @@ export default function LoginForm() {
   const submitHandler = async (e) => {
     e.preventDefault();
     let data = await postLogin( username, password );
-    console.log(data.data.user.role, "dataaaa");
     
       if (data && data.success === true) {
         sessionStorage.setItem("access_token", data.data.session_id);

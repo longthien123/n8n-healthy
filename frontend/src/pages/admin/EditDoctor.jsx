@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./AddDoctor.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@mui/material";
-import { createNewDoctor } from "../../services/DoctorServicce";
+import { createNewDoctor, getDoctorById } from "../../services/DoctorServicce";
 
-export default function AddDoctor() {
+export default function EditDoctor() {
   const [doctor, setDoctor] = useState({
     fullname: "",
     email: "",
@@ -18,7 +18,34 @@ export default function AddDoctor() {
     shiftEnd: "",
     bio:""
   });
-
+  const params = useParams()
+  console.log(params.id);
+  
+    const fetchDoctor = async () => {
+        try {
+          const response = await getDoctorById(params.id);
+          console.log(response);
+          
+          setDoctor({
+            fullname: response.data.user.full_name,
+    email: response.data.user.email,
+    username:response.data.user.username,
+    password: response.data.user.password,
+    phone: response.data.user.phone,
+    specialization: response.data.specialization,
+    license_number: response.data.license_number,
+    experience_years: response.data.experience_years,
+    bio: response.data.bio,
+            shiftStart: response.data.shiftStart || "",
+            shiftEnd: response.data.shiftEnd || ""
+          });
+        } catch (error) {
+          console.error("Error fetching doctor:", error);
+        }
+      };
+      useEffect(() => {
+        fetchDoctor()
+      }, [])
   const navigate = useNavigate();
 
   const handleChangeHandler = (e) => {
@@ -48,7 +75,7 @@ export default function AddDoctor() {
   return (
     <div className="doctor-form">
       <div className="form-box">
-        <h2>Add Doctor</h2>
+        <h2>Edit Doctor</h2>
 
         <div className="form-grp">
           <label>Name:</label>
@@ -151,7 +178,7 @@ export default function AddDoctor() {
 
         <div className="form-grp">
           <button type="submit" id="doc-submit" onClick={() => handleSubmit()}>
-            Add Doctor
+            Save Doctor
           </button>
         </div>
       </div>

@@ -1,70 +1,85 @@
 .doctor-form {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: auto;
-    background-color:white;
-  }
-  
-  
-  
-  .form-box {
-    width: 500px;
-    padding: 20px;
-    background-color: rgb(238, 240, 246);
-    border-radius: 10px;
-  }
-  
-  h2 {
-    text-align: center;
-    margin-bottom: 10px;
-  }
-  
-  label {
-    font-weight: bold;
-    color: rgb(70, 70, 84);
-  }
-  
-  input[type='number'],
-  input[type='text']{
-  width: 90%;
-  padding: 8px;
-  border: none;
-  outline: none;
-  border-bottom: 2px solid rgb(179, 177, 177);
-  margin: 10px;
-  background: transparent;
-  }
-  
-  #doc-submit {
-  width: 25%;
-  margin-left: 35%;
-  margin-top: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 30px 0;
+  background-color: #f5f6fa;
+}
+
+.form-box {
+  width: 500px;
+  padding: 30px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 25px;
+  color: #060b26;
+}
+
+.form-grp {
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+}
+
+label {
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 5px;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="datetime-local"] {
+  width: 95%;
   padding: 10px;
+  border: 1px solid #c4c4c4;
+  border-radius: 6px;
+  outline: none;
+  transition: 0.2s;
+}
+
+input:focus {
+  border-color: #4caaaf;
+  box-shadow: 0 0 5px rgba(76, 170, 175, 0.3);
+}
+
+#doc-submit {
+  width: 40%;
+  margin: 20px auto 0;
+  display: block;
+  padding: 12px;
   background-color: #060b26;
-  color: white;
+  color: #fff;
   font-weight: bold;
   cursor: pointer;
-  border: 1px solid #060b26;
-  border-radius: 10px;
-  
+  border: none;
+  border-radius: 8px;
+  transition: 0.2s;
+}
+
+#doc-submit:hover {
+  background-color: #0f7378;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .form-box {
+    width: 90%;
+    padding: 20px;
   }
-  #doc-submit:hover{
-    background-color: rgb(47, 50, 52);
+
+  #doc-submit {
+    width: 60%;
   }
-  
-  @media (max-width: 768px) {
-    .form-box {
-      width: 90%;
-      height: auto;
-    }
-    
-    .doctor-form {
-      height: auto;
-      padding: 20px;
-    }
-    #doc-submit {
-      width: 40%;
-      margin-left: 30%;
-    }
+
+  input[type="text"],
+  input[type="number"],
+  input[type="datetime-local"] {
+    width: 100%;
   }
+}
