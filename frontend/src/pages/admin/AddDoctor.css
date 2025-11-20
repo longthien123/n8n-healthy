@@ -6,13 +6,43 @@
   background-color: #f5f6fa;
 }
 
+/* Khung chứa toàn bộ form */
 .form-box {
-  width: 500px;
+  width: 900px;
   padding: 30px;
   background-color: #ffffff;
   border-radius: 12px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
 }
+
+/* ===================== */
+/* GRID 2 CỘT CHO FORM   */
+/* ===================== */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 30px;
+}
+
+/* Bên trái */
+.form-left {
+  padding-right: 10px;
+}
+
+/* Bên phải */
+.form-right {
+  padding-left: 10px;
+}
+
+.form-right h3 {
+  margin-bottom: 15px;
+  color: #060b26;
+  text-align: center;
+}
+
+/* ===================== */
 
 h2 {
   text-align: center;
@@ -32,9 +62,13 @@ label {
   margin-bottom: 5px;
 }
 
+/* Inputs */
 input[type="text"],
 input[type="number"],
-input[type="datetime-local"] {
+input[type="date"],
+input[type="time"],
+input[type="email"],
+input[type="password"] {
   width: 95%;
   padding: 10px;
   border: 1px solid #c4c4c4;
@@ -48,10 +82,16 @@ input:focus {
   box-shadow: 0 0 5px rgba(76, 170, 175, 0.3);
 }
 
+/* Nút submit */
+.submit-zone {
+  grid-column: 1 / 3;
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
 #doc-submit {
   width: 40%;
-  margin: 20px auto 0;
-  display: block;
   padding: 12px;
   background-color: #060b26;
   color: #fff;
@@ -66,20 +106,28 @@ input:focus {
   background-color: #0f7378;
 }
 
-/* Mobile */
+/* ===================== */
+/* Mobile Responsive      */
+/* ===================== */
 @media (max-width: 768px) {
   .form-box {
-    width: 90%;
+    width: 95%;
     padding: 20px;
   }
 
-  #doc-submit {
-    width: 60%;
+  .form-grid {
+    grid-template-columns: 1fr;
   }
 
-  input[type="text"],
-  input[type="number"],
-  input[type="datetime-local"] {
+  input {
     width: 100%;
+  }
+
+  #doc-submit {
+    width: 70%;
+  }
+
+  .submit-zone {
+    grid-column: 1 / 2;
   }
 }

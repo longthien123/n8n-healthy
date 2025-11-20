@@ -16,10 +16,10 @@ import {
 } from "@mui/material";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { deleteDoctor, getAllDoctor } from "../../services/DoctorServicce";
+import { deleteDoctor, deleteDoctorSchedule, getAllDoctor, getSchedule } from "../../services/DoctorServicce";
 import { toast } from "react-toastify";
 
-export default function DoctorList() {
+export default function DoctorScheduleList() {
   const navigate = useNavigate();
   const [doctors, setDoctors] = useState([]);
   const [page, setPage] = useState(0);
@@ -27,7 +27,7 @@ export default function DoctorList() {
 
   const fetchDoctors = async () => {
     try {
-      const response = await getAllDoctor();
+      const response = await getSchedule();
       setDoctors(response.data);
     } catch (error) {
       console.log(error);
@@ -52,10 +52,10 @@ export default function DoctorList() {
     page * rowsPerPage + rowsPerPage
   );
   const handleDelete = async (id) => {
-    const response = await deleteDoctor(id);
+    const response = await deleteDoctorSchedule(id);
     if (response) {
       toast.success(response.message)
-      navigate("admin/doctor")
+      navigate("/admin/doctor-schedule")
     }
   }
   return (
@@ -65,14 +65,14 @@ export default function DoctorList() {
         gutterBottom
         sx={{ fontWeight: "bold", color: "#060b26", mb: 3, textAlign: "center" }}
       >
-        Doctors List
+        Doctors Schedule
       </Typography>
 
       <TableContainer component={Paper} sx={{ borderRadius: "12px", overflow: "hidden", boxShadow: 3 }}>
         <Table sx={{ minWidth: 650 }}>
           <TableHead>
             <TableRow sx={{ backgroundColor: "#060b26" }}>
-              {["Name", "Email", "Phone", "Experience", "License", "Specialization", "Actions"].map((header) => (
+              {["ID Doctor","Name", "Day work", "CheckIn", "CheckOut", "Status", "Note", "Actions"].map((header) => (
                 <TableCell
                   key={header}
                   sx={{ color: "white", fontWeight: "bold", textAlign: "center" }}
@@ -92,22 +92,23 @@ export default function DoctorList() {
                   "&:hover": { backgroundColor: "#e3f2fd" },
                 }}
               >
-                <TableCell>{doctor.user.full_name}</TableCell>
-                <TableCell>{doctor.user.email}</TableCell>
-                <TableCell>{doctor.user.phone}</TableCell>
-                <TableCell>{doctor.experience_years}</TableCell>
-                <TableCell>{doctor.license_number}</TableCell>
-                <TableCell>{doctor.specialization}</TableCell>
+                <TableCell>{doctor.doctor}</TableCell>
+                <TableCell>{doctor.doctor_name}</TableCell>
+                <TableCell>{doctor.work_date}</TableCell>
+                <TableCell>{doctor.start_time}</TableCell>
+                <TableCell>{doctor.end_time}</TableCell>
+                <TableCell>{doctor.status}</TableCell>
+                <TableCell>{doctor.notes}</TableCell>
                 <TableCell>
                   <Stack direction="row" spacing={1} justifyContent="center">
-                    <Button
+                    {/* <Button
                       variant="contained"
                       color="primary"
                       size="small"
                       onClick={() => navigate(`/admin/doctor/${doctor.id}`)}
                     >
                       Edit
-                    </Button>
+                    </Button> */}
                     <Button
                       variant="contained"
                       color="error"
@@ -139,9 +140,9 @@ export default function DoctorList() {
         variant="contained"
         color="success"
         sx={{ mt: 3, float: "right" }}
-        onClick={() => navigate("/admin/add-doctor")}
+        onClick={() => navigate("/admin/doctor")}
       >
-        Add Doctor
+        Add Schedule
       </Button>
     </Box>
   );

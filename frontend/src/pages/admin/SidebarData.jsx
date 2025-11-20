@@ -21,6 +21,12 @@ const SidebarData = [
     icon: <FaIcons.FaUserNurse />,
     cName: "nav-text",
   },
+  {
+    title: "Schedules",
+    path: "/admin/doctor-schedule",
+    icon: <FaIcons.FaUserNurse />,
+    cName: "nav-text",
+  },
 ];
 
 export default SidebarData

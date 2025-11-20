@@ -1,7 +1,7 @@
 import axios from "axios";
 import nProgress from "nprogress";
 const instance = axios.create({
-    baseURL: 'http://127.0.0.1:8000/api/users/',
+    baseURL: 'http://127.0.0.1:8000/api/',
     // timeout: 1000,
     // headers: {'X-Custom-Header': 'foobar'}
 });
@@ -11,11 +11,11 @@ instance.interceptors.request.use(function (config) {
 //   if (!config.url.includes("/auth/login")) {
 //     config.headers['Authorization'] = "Bearer " + access_token;
 //   }
-// const access_token = sessionStorage.getItem("access_token");
+const access_token = sessionStorage.getItem("access_token");
 
-// if (!config.url?.includes("/auth/login") && access_token) {
-//   config.headers["Authorization"] = "Bearer " + access_token;
-// }
+if (!config.url?.includes("/auth/login") && access_token) {
+  config.headers["Authorization"] = "Bearer " + access_token;
+}
   //trc khi gửi request đi thì bật thanh loading
   nProgress.start();
     // Do something before request is sent

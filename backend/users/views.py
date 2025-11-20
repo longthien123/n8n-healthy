@@ -70,7 +70,7 @@ def login_user(request):
     }, status=status.HTTP_401_UNAUTHORIZED)
 
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def logout_user(request):
     """API đăng xuất"""
     logout(request)
@@ -80,7 +80,7 @@ def logout_user(request):
     }, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def current_user(request):
     """API lấy thông tin user hiện tại"""
     serializer = UserSerializer(request.user)
@@ -132,7 +132,7 @@ def get_doctor(request, pk):
     })
 
 @api_view(['PUT', 'PATCH'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def update_doctor(request, pk):
     """API cập nhật thông tin bác sĩ"""
     doctor = get_object_or_404(Doctor, pk=pk)
@@ -152,7 +152,7 @@ def update_doctor(request, pk):
     }, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['DELETE'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def delete_doctor(request, pk):
     """API xóa bác sĩ"""
     doctor = get_object_or_404(Doctor, pk=pk)
@@ -207,7 +207,7 @@ def get_patient(request, pk):
     })
 
 @api_view(['PUT', 'PATCH'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def update_patient(request, pk):
     """API cập nhật thông tin bệnh nhân"""
     patient = get_object_or_404(Patient, pk=pk)
@@ -227,7 +227,7 @@ def update_patient(request, pk):
     }, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['DELETE'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def delete_patient(request, pk):
     """API xóa bệnh nhân"""
     patient = get_object_or_404(Patient, pk=pk)
@@ -240,7 +240,7 @@ def delete_patient(request, pk):
     }, status=status.HTTP_204_NO_CONTENT)
 
 @api_view(['POST'])
-@permission_classes([AllowAny])  # Có thể đổi thành IsAuthenticated nếu chỉ admin mới tạo được admin
+@permission_classes([AllowAny])  # Có thể đổi thành AllowAny nếu chỉ admin mới tạo được admin
 def create_admin(request):
     """
     API tạo admin mới

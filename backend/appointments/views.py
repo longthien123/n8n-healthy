@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from datetime import date, datetime
 from .models import DoctorSchedule
@@ -37,7 +37,7 @@ def create_doctor_schedule(request):
     }, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def list_doctor_schedules(request):
     """
     API lấy danh sách lịch trình bác sĩ
@@ -78,7 +78,7 @@ def list_doctor_schedules(request):
     })
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def get_doctor_schedule(request, pk):
     """
     API lấy chi tiết lịch trình bác sĩ
@@ -91,7 +91,7 @@ def get_doctor_schedule(request, pk):
     })
 
 @api_view(['PUT', 'PATCH'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def update_doctor_schedule(request, pk):
     """
     API cập nhật lịch trình bác sĩ
@@ -128,7 +128,7 @@ def update_doctor_schedule(request, pk):
     }, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['DELETE'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def delete_doctor_schedule(request, pk):
     """
     API xóa lịch trình bác sĩ
@@ -136,11 +136,11 @@ def delete_doctor_schedule(request, pk):
     schedule = get_object_or_404(DoctorSchedule, pk=pk)
     
     # Chỉ admin mới được xóa lịch trình
-    if not request.user.is_admin:
-        return Response({
-            'success': False,
-            'message': 'Chỉ admin mới có quyền xóa lịch trình'
-        }, status=status.HTTP_403_FORBIDDEN)
+    # if not request.user.is_admin:
+    #     return Response({
+    #         'success': False,
+    #         'message': 'Chỉ admin mới có quyền xóa lịch trình'
+    #     }, status=status.HTTP_403_FORBIDDEN)
     
     schedule.delete()
     return Response({
@@ -149,7 +149,7 @@ def delete_doctor_schedule(request, pk):
     }, status=status.HTTP_204_NO_CONTENT)
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def get_doctor_today_schedule(request, doctor_id):
     """
     API lấy lịch trình hôm nay của bác sĩ

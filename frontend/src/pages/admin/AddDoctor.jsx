@@ -3,6 +3,7 @@ import "./AddDoctor.css";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@mui/material";
 import { createNewDoctor } from "../../services/DoctorServicce";
+import { toast } from "react-toastify";
 
 export default function AddDoctor() {
   const [doctor, setDoctor] = useState({
@@ -33,7 +34,7 @@ export default function AddDoctor() {
     username: doctor.username,
     email: doctor.email,
     password: doctor.password,
-    full_name: doctor.full_name,
+    full_name: doctor.fullname,
     phone: doctor.phone || '',
     specialization: doctor.specialization || '',
     license_number: doctor.license_number || '',
@@ -41,7 +42,10 @@ export default function AddDoctor() {
     bio: doctor.bio || ''
   };
   const response = await createNewDoctor(doctorData);
-  console.log(response);
+  if(response && response.success === true){
+    toast.success(response.message)
+    navigate("/admin/doctor")
+  }
   
   };
 
@@ -129,7 +133,7 @@ export default function AddDoctor() {
           />
         </div>
         {/* MỚI: Thêm ca vào và ra */}
-        <div className="form-grp">
+        {/* <div className="form-grp">
           <label>Shift Start (Check in):</label>
           <input
             type="datetime-local"
@@ -147,7 +151,7 @@ export default function AddDoctor() {
             value={doctor.shiftEnd}
             onChange={handleChangeHandler}
           />
-        </div>
+        </div> */}
 
         <div className="form-grp">
           <button type="submit" id="doc-submit" onClick={() => handleSubmit()}>

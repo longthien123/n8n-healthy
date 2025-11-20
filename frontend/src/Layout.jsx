@@ -12,6 +12,7 @@ import DoctorCard from "./pages/user/DoctorCard";
 import Slider from "./pages/user/Slider";
 import BookingPage from "./pages/user/BookingPage";
 import EditDoctor from "./pages/admin/EditDoctor";
+import DoctorScheduleList from "./pages/admin/DoctorScheduleList";
 
 const  Layout = () => {
       return (
@@ -31,8 +32,10 @@ const  Layout = () => {
                 <Route path="patient" element={<PatientList />} />  
                 <Route path="add-patient" element={<AddPatient />} />  
                 <Route path="doctor" element={<DoctorList />} />  
+                <Route path="doctor-schedule" element={<DoctorScheduleList />} />  
                 <Route path="add-doctor" element={<AddDoctor />} />  
                 <Route path="doctor/:id" element={<EditDoctor />} />  
+
                 
                 
             </Route>
