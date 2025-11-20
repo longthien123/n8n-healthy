@@ -6,7 +6,8 @@ from rest_framework.response import Response
 from django.contrib.auth import login, logout
 from .serializers import UserCreateSerializer, UserSerializer, LoginSerializer
 from .models import User
-
+from django.views.decorators.csrf import csrf_exempt
+@csrf_exempt
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def create_user(request):

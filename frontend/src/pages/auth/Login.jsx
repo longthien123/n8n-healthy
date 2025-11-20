@@ -3,81 +3,74 @@ import image from "./Asset 1.png";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { postLogin } from "../../services/AuthService";
 
-export default function LoginForm({ Login, error }) {
-  const [email, setEmail] = useState("");
+export default function LoginForm() {
+  const [username, setUserName] = useState("");
   const [password, setPassword] = useState("");
-  const [loginSuccess, setLoginSuccess] = useState(false);
-  const navigate = useNavigate()
-  const submitHandler = (e) => {
+  const navigate = useNavigate();
+
+  const submitHandler = async (e) => {
     e.preventDefault();
-    toast.success("đăng nhập thành công")
-    // console.log(email, password);
-    // fetch("http://localhost:3001/admin/login", {
-    //   method: "POST",
-    //   crossDomain: true,
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //     Accept: "application/json",
-    //     "Access-Control-Allow-Origin": "*",
-    //   },
-    //   body: JSON.stringify({
-    //     email,
-    //     password,
-    //   }),
-    // })
-    //   .then((res) => res.json())
-    //   .then((data) => {
-    //     console.log(data, "userRegister");
-    //     if (data.message === "Admin successfully registered") {
-    //       setLoginSuccess(true);
-    //       window.localStorage.setItem("token", data.data.token);
-    //       window.localStorage.setItem("loggedIn", true);
-    //       setTimeout(() => {
-    //         window.location.href = "./home";
-    //       }, 150);
-    //     }
-    //   });
-    navigate("/admin")
+    let data = await postLogin( username, password );
+      if (data && data.success === true) {
+        sessionStorage.setItem("access_token", data.data.session_id);
+        sessionStorage.setItem(
+          "user",
+          JSON.stringify({
+            id: data.data.user.id,
+            role: data.data.user.role,
+            name: data.data.user.full_name,
+          })
+        );
+        if (data.data.user.role === "ADMIN") {
+          navigate("/admin");
+        } else if (data.data.user.role === "USER") {
+          navigate("/");
+        }
+        toast.success(data.message);
+      }
+      if (data && data.success !== true) {
+        toast.error("Đăng nhập thất bại!");
+      }
   };
 
   return (
-    <form onSubmit={submitHandler} className="login-form">
-      <div className="image-container">
-        <img src={image} alt="Login" className="login-image" />
-      </div>
-      <div className="form-inner">
-        <h2>Login</h2>
-        {error !== "" && <div className="error">{error}</div>}
+    <div className="login-container">
+      <div className="login-card">
 
-        <div className="form-group">
-          <label htmlFor="email">Email:</label>
-          <input
-            type="email"
-            name="email"
-            id="email"
-            onChange={(e) => setEmail(e.target.value)}
-          />
+        <div className="left-side">
+          <img src={image} alt="Login visual" className="login-image" />
         </div>
 
-        <div className="form-group">
-          <label htmlFor="password">Password:</label>
-          <input
-            type="password"
-            name="password"
-            id="password"
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </div>
+        <form onSubmit={submitHandler} className="right-side">
+          <h2 className="title">WELCOME BACK</h2>
+          <p className="subtitle">Please login to continue</p>
 
-        <input type="submit" value="LOGIN" />
-        {loginSuccess && (
-        <div className="success">Login successful!</div>
-      )}
+          <div className="form-group">
+            <label>User Name</label>
+            <input className="text"
+              type="text"
+              placeholder="Enter username"
+              onChange={(e) => setUserName(e.target.value)}
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Password</label>
+            <input
+              type="password"
+              placeholder="Enter password"
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+
+          <button className="btn-login">LOGIN</button>
+        </form>
+
       </div>
-      <div className="quote-container">
-        <p className="quote">"The heart of your healthcare. "</p>
-      </div>
-    </form>
+    </div>
   );
 }

@@ -4,6 +4,8 @@ import App from './App'
 import "./main.css"
 import Layout from './Layout'
 import { BrowserRouter } from 'react-router-dom'
+import 'nprogress/nprogress.css';
+
 const rootElement = document.getElementById('root');
 
 if (rootElement) {

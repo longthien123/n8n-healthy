@@ -1,124 +1,127 @@
-
-.login-form {
+/* Vùng bao */
+.login-container {
+  height: 100vh;
+  width: 100%;
+  background: linear-gradient(to right bottom, #d8f3f4, #ffffff);
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
-  background-color:white;
 }
+
+/* Card chính */
+.login-card {
+  display: flex;
+  width: 800px;
+  min-height: 450px;
+  background: #ffffff;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0px 8px 30px rgba(0, 0, 0, 0.1);
+  animation: fadeIn 0.4s ease;
+}
+
+/* Cột trái (ảnh) */
+.left-side {
+  flex: 1;
+  background: #e7f9fa;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .login-image {
-  width: 350px;
-  height: 350px; 
-  padding-right: 50px;
-  
+  width: 75%;
 }
 
-.form-inner {
-  width: 300px;
-  height:310px ;
-  padding: 20px;
-  background-color: white;
-  border: 2px solid #4caaaf;
-  border-radius: 10px;
+/* Cột phải (form) */
+.right-side {
+  flex: 1;
+  padding: 40px 50px;
 }
 
-h2 {
+.title {
   text-align: center;
-}
-
-.error {
-  color: red;
-}
-
-.form-group {
-  margin-bottom: 10px;
-}
-
-label {
+  font-size: 28px;
   font-weight: bold;
-}
-
-
-input[type='email'],
-input[type='password'] {
-  width: 90%;
-  padding: 8px;
-  border-radius: 5px;
-  border: 1px solid #4caaaf
-}
-
-input[type='submit'] {
-  width: 50%;
-  margin-left: 25%;
-  margin-top: 30px;
-  padding: 8px;
-  background-color: #4caaaf;
-  color: white;
-  font-weight: bold;
-  cursor: pointer;
-  border: 1px solid #4caaaf;
-  border-radius: 5px;
-
-}
-
-.quote-container {
-position: relative;
-margin-top: 20px;
-}
-
-.quote {
-  white-space: nowrap;
-  text-align: center;
-  color: bl;
-  position: absolute;
-  bottom: -300px;
-  left: -350px;
-  transform: translateX(-50%);
-  font-size: 35px;
-  font-weight: bold;
+  letter-spacing: 1px;
   color: #0f7378;
 }
 
-.success {
-  position: relative;
-  z-index: 2;
-  bottom: -10px;
-  left: 50%;
-  transform: translateX(-50%);
-  color: green;
-  opacity: 0;
-  animation-name: fade-in;
-  animation-duration: 0.15s;
-  animation-fill-mode: forwards;
-  margin-top: 10px;
-  font-weight: bold;
+.subtitle {
   text-align: center;
+  color: #6c6c6c;
+  margin-bottom: 25px;
+  margin-top: -5px;
+  font-size: 14px;
 }
 
-@keyframes fade-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+.form-group {
+  margin-bottom: 18px;
 }
 
+label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #0f7378;
+}
+
+input {
+  width: 100%;
+  padding: 10px;
+  border: 1.5px solid #b6e1e3;
+  border-radius: 8px;
+  outline: none;
+  font-size: 14px;
+  transition: 0.2s ease;
+}
+
+input:focus {
+  border-color: #4caaaf;
+  box-shadow: 0 0 3px rgba(76, 170, 175, 0.5);
+}
+
+.btn-login {
+  width: 100%;
+  padding: 12px;
+  background-color: #4caaaf;
+  color: white;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 15px;
+  font-size: 15px;
+  transition: 0.2s;
+  border: none;
+}
+
+.btn-login:hover {
+  background-color: #3a8f94;
+  transform: translateY(-2px);
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Mobile */
 @media (max-width: 760px) {
-  .login-image {
-    width: 200px;
-    height: 250px;
-    padding-bottom: 20px;
-    padding-right: 0px;
-  }
-  .quote-container {
-    visibility: hidden;
-  }
-  .login-form {
-    display: flex;
-    width: 100%;
+  .login-card {
     flex-direction: column;
-    border-radius: 0px;
-    padding: 0;
+    width: 90%;
+  }
+
+  .left-side {
+    padding: 20px 0;
+  }
+
+  .right-side {
+    padding: 30px 25px;
+  }
+
+  .login-image {
+    width: 50%;
   }
 }
