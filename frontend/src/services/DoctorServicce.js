@@ -44,7 +44,7 @@ const getSchedule = () => {
 }
 
 const createSchedule = (doctorData) => {
-    console.log(doctorData);
+    console.log(doctorData, "datadoc");
     
     return axios.post(`appointments/schedules/create/`, {
         doctor: doctorData.doctor,
@@ -56,7 +56,7 @@ const createSchedule = (doctorData) => {
     })
 }
 const getScheduleOfDoctor = (id) => {
-    return axios.get(`appointments/schedules/${id}/`)
+    return axios.get(`appointments/schedules/${id}/week/`)
 }
 export {
     getAllDoctor,
