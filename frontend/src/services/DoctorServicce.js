@@ -55,6 +55,9 @@ const createSchedule = (doctorData) => {
         note: doctorData.note,
     })
 }
+const getScheduleOfDoctor = (id) => {
+    return axios.get(`appointments/schedules/${id}/`)
+}
 export {
     getAllDoctor,
     createNewDoctor,
@@ -63,5 +66,6 @@ export {
     deleteDoctor,
     getSchedule,
     deleteDoctorSchedule,
-    createSchedule
+    createSchedule,
+    getScheduleOfDoctor
 }

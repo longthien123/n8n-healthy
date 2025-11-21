@@ -26,7 +26,7 @@ const  Layout = () => {
             <Route path="/" element={<HomeUser />} >
                 <Route index element={<Slider />} />
                 <Route path="doctors" element={<DoctorCard />} />  
-                <Route path="doctors/book-appointment/:doctorNo" element={<BookingPage />} />  
+                <Route path="doctors/book-appointment/:id" element={<BookingPage />} />  
             </Route>
 
             <Route path="admin" element={<Home />} >

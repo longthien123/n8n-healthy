@@ -30,7 +30,7 @@ const DoctorGrid = () => {
     fetchDoctor();
   }, []);
 
-  const getAvatarSrc = (gender) => (gender === "MALE" ? maleAvatar : femaleAvatar);
+  const getAvatarSrc = (gender) => (gender === "MALE" ? maleAvatar : maleAvatar);
 
   return (
     <Box sx={{ padding: "30px" }}>
@@ -71,18 +71,18 @@ const DoctorGrid = () => {
 
               <CardContent>
                 <Typography variant="h6" sx={{ fontWeight: "bold", color: "#002D62" }}>
-                  {doctor.fullname}
+                  {doctor.user.full_name}
                 </Typography>
 
                 <Typography variant="body2" sx={{ mt: 1, color: "#444" }}>
-                  📞 {doctor.phone}
+                  📞 {doctor.user.phone}
                 </Typography>
 
                 <Typography
                   variant="body2"
                   sx={{ mt: 1, color: "#1F75FE", fontWeight: "bold" }}
                 >
-                  🩺 {doctor.Specialty}
+                  🩺 {doctor.specialization}
                 </Typography>
 
                 <Button
@@ -97,7 +97,7 @@ const DoctorGrid = () => {
                     "&:hover": { backgroundColor: "#002D62" },
                   }}
                   onClick={() =>
-                    navigate(`/doctors/book-appoinment/${doctor.doctorNo}`)
+                    navigate(`/doctors/book-appointment/${doctor.id}`)
                   }
                 >
                   View Details
