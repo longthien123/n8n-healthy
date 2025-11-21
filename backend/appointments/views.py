@@ -460,3 +460,52 @@ def delete_appointment(request, pk):
         'success': True,
         'message': 'Xóa lịch khám thành công'
     }, status=status.HTTP_204_NO_CONTENT)
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_doctor_week_schedules(request, doctor_id):
+    """
+    API lấy lịch trình tuần của bác sĩ theo ID
+    URL: /doctor/{doctor_id}/week/
+    """
+    try:
+        doctor = Doctor.objects.select_related('user').get(id=doctor_id)
+    except Doctor.DoesNotExist:
+        return Response({
+            'success': False,
+            'message': f'Bác sĩ với ID {doctor_id} không tồn tại'
+        }, status=status.HTTP_404_NOT_FOUND)
+    
+    from datetime import timedelta
+    
+    # Lấy tuần hiện tại hoặc tuần theo tham số
+    week_date = request.GET.get('week_date')
+    if week_date:
+        try:
+            base_date = datetime.strptime(week_date, '%Y-%m-%d').date()
+        except ValueError:
+            base_date = date.today()
+    else:
+        base_date = date.today()
+    
+    # Tính ngày đầu tuần (Thứ 2) và cuối tuần (Chủ nhật)
+    start_of_week = base_date - timedelta(days=base_date.weekday())
+    end_of_week = start_of_week + timedelta(days=6)
+    
+    # Lấy tất cả lịch trình trong tuần
+    schedules = DoctorSchedule.objects.filter(
+        doctor=doctor,
+        work_date__gte=start_of_week,
+        work_date__lte=end_of_week
+    ).order_by('work_date', 'start_time')
+    
+    serializer = DoctorScheduleSerializer(schedules, many=True)
+    
+    return Response({
+        'success': True,
+        'doctor_id': doctor.id,
+        'doctor_name': doctor.user.full_name,
+        'week_range': f"{start_of_week} đến {end_of_week}",
+        'schedules': serializer.data,
+        'count': schedules.count()
+    })
