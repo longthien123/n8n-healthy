@@ -13,13 +13,16 @@ import Slider from "./pages/user/Slider";
 import BookingPage from "./pages/user/BookingPage";
 import EditDoctor from "./pages/admin/EditDoctor";
 import DoctorScheduleList from "./pages/admin/DoctorScheduleList";
+import PatientRegister from "./pages/auth/patientRegister";
+import EditPatient from "./pages/admin/EditPatient";
 
 const  Layout = () => {
       return (
     <>
         <Routes>
             <Route path="login" element={<LoginForm />} />
-            {/* <Route path="register" element={<Register />} /> */}
+            {/* <Route path="register" element={<SignUpForm />} /> */}
+            <Route path="info-patient" element={<PatientRegister />} />
             <Route path="/" element={<HomeUser />} >
                 <Route index element={<Slider />} />
                 <Route path="doctors" element={<DoctorCard />} />  
@@ -31,6 +34,7 @@ const  Layout = () => {
                 <Route path="dashboard" element={<Card />} />  
                 <Route path="patient" element={<PatientList />} />  
                 <Route path="add-patient" element={<AddPatient />} />  
+                <Route path="patient/:id" element={<EditPatient />} />  
                 <Route path="doctor" element={<DoctorList />} />  
                 <Route path="doctor-schedule" element={<DoctorScheduleList />} />  
                 <Route path="add-doctor" element={<AddDoctor />} />  

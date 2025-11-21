@@ -33,3 +33,78 @@
   background-color: rgba(0,0,0,0.2);
   border-radius: 3px;
 }
+.Table {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.patient-container {
+  width: 90%;
+  max-width: 1200px;
+  padding: 20px 0;
+}
+
+.title {
+  font-weight: bold !important;
+  color: #060b26;
+  text-align: center;
+  margin-bottom: 20px !important;
+}
+
+.table-wrapper {
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.table-box {
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.table-header-row {
+  background-color: #060b26;
+}
+
+.table-header {
+  color: white !important;
+  font-weight: bold !important;
+}
+
+.table-row:hover {
+  background-color: rgba(0,0,0,0.08);
+  transition: 0.2s ease-in-out;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+/* Add Button */
+.add-btn {
+  margin-top: 20px !important;
+  background-color: #060b26 !important;
+}
+
+.add-btn:hover {
+  background-color: #0b3558 !important;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .table-wrapper {
+    overflow-x: auto;
+  }
+
+  .table-header, .MuiTableCell-body {
+    font-size: 12px !important;
+    padding: 6px 8px !important;
+  }
+
+  .add-btn {
+    width: 100%;
+  }
+}
+

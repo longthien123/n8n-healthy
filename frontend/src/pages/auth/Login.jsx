@@ -26,8 +26,10 @@ export default function LoginForm() {
         );
         if (data.data.user.role === "ADMIN") {
           navigate("/admin");
-        } else if (data.data.user.role === "USER") {
+        } else if (data.data.user.role === "PATIENT") {
           navigate("/");
+        } else if (data.data.user.role === "DOCTOR") {
+          navigate("/doctor");
         }
         toast.success(data.message);
       }
@@ -69,6 +71,12 @@ export default function LoginForm() {
           </div>
 
           <button className="btn-login">LOGIN</button>
+          <p className="no-account">
+  Chưa có tài khoản?{" "}
+  <span className="register-link" onClick={() => navigate("/info-patient")}>
+    Đăng ký ngay
+  </span>
+</p>
         </form>
 
       </div>

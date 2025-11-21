@@ -10,182 +10,131 @@ import {
   TablePagination,
   Box,
   Typography,
-  Button
+  Button,
+  IconButton,
+  Tooltip,
 } from "@mui/material";
-import axios from "axios";
 import "./PatientList.css";
 import { useNavigate } from "react-router-dom";
+import { deletePatient, getPatient } from "../../services/PatientService";
+import { toast } from "react-toastify";
 
-export default function PatientList({ patient }) {
+export default function PatientList() {
   const navigate = useNavigate();
   const [patients, setPatients] = useState([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+
   const getPatients = async () => {
-    // try {
-    //   const response = await axios.get("http://localhost:3001/patient/all");
-    //   console.log(response);
-    //   setPatients(response.data.data.patients);
-    // } catch (error) {
-    //   console.log(error);
-    // }
+    const res = await getPatient();
+    if (res) setPatients(res.data);
   };
-
-
 
   useEffect(() => {
     getPatients();
   }, []);
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
+
+  const handleDelete = async (id) => {
+    const response = await deletePatient(id);
+    if (response) {
+      toast.success(response.message);
+      navigate("admin/patient");
+    }
   };
 
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
   const displayedPatients = patients.slice(
     page * rowsPerPage,
     page * rowsPerPage + rowsPerPage
   );
+
   return (
     <div className="Table">
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-        }}
-      >
-        <Typography variant="h4"
-          component="h2"
-          gutterBottom
-          mt={2}
-          style={{ fontWeight: "bold", marginBottom: "10px", color: "#060b26" }}>
+      <div className="patient-container">
+        <Typography variant="h4" className="title">
           Patients List
         </Typography>
-        <div style={{ overflowX: "auto", width: "100%" }}>
-          <Box
-            sx={{
-              borderRadius: "10px",
-              overflow: "hidden",
-              boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-              padding: "20px 10%",
-            }}
-          >
-            <TableContainer component={Paper}>
-              <Box sx={{ borderRadius: "10px", overflow: "auto" }}>
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell
-                        sx={{
-                          fontWeight: "bold",
-                          backgroundColor: "#060b26",
-                          color: "common.white",
-                        }}
-                      >
-                        Patient No
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          fontWeight: "bold",
-                          backgroundColor: "#060b26",
-                          color: "common.white",
-                        }}
-                      >
-                        Name
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          fontWeight: "bold",
-                          backgroundColor: "#060b26",
-                          color: "common.white",
-                        }}
-                      >
-                        Age
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          fontWeight: "bold",
-                          backgroundColor: "#060b26",
-                          color: "common.white",
-                        }}
-                      >
-                        Gender
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          fontWeight: "bold",
-                          backgroundColor: "#060b26",
-                          color: "common.white",
-                        }}
-                      >
-                        Action
-                      </TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {displayedPatients.map((patient) => (
-                      <TableRow
-                        key={patient.PatientNo}
-                        sx={{
-                          "&:nth-of-type(even)": {
-                            backgroundColor: "background.default",
-                          },
-                          "&:hover": { backgroundColor: "rgba(0, 0, 0, 0.1)" },
-                        }}
-                      >
-                        <TableCell>{patient.PatientNo}</TableCell>
-                        <TableCell>{patient.fullname}</TableCell>
-                        <TableCell>{patient.age}</TableCell>
-                        <TableCell>{patient.gender}</TableCell>
-                        <TableCell>
-                          <Button
-                            variant="contained"
-                            color="error"
-                            style={{ fontSize: "10px" }}
-                            onClick={async () => {
-                              await axios.delete(
-                                "http://localhost:3001/patient/", {
-                                params: {
-                                  PatientNo: patient.PatientNo
-                                }
-                              }
-                              );
-                              window.location="/PatientList"
 
-                            }}
+        <Box className="table-wrapper">
+          <TableContainer component={Paper} className="table-box">
+            <Table>
+              <TableHead>
+                <TableRow className="table-header-row">
+                  {[
+                    "Patient No",
+                    "Name",
+                    "Date of Birth",
+                    "Gender",
+                    "Address",
+                    "Blood",
+                    "Action",
+                  ].map((header) => (
+                    <TableCell key={header} className="table-header">
+                      {header}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              </TableHead>
 
-                          >Remove </Button>
+              <TableBody>
+                {displayedPatients.map((patient) => (
+                  <TableRow key={patient.id} className="table-row">
+                    <TableCell>BN{patient.id}</TableCell>
+                    <TableCell>{patient.user.full_name}</TableCell>
+                    <TableCell>{patient.date_of_birth}</TableCell>
+                    <TableCell>{patient.gender}</TableCell>
+                    <TableCell>{patient.address}</TableCell>
+                    <TableCell>{patient.blood_type}</TableCell>
 
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </Box>
-            </TableContainer>
-          </Box>
-        </div>
+                    <TableCell>
+                      <div className="action-buttons">
+                        {/* EDIT BUTTON */}
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          size="small"
+                          onClick={() =>
+                            navigate(`/admin/patient/${patient.id}`)
+                          }
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          variant="contained"
+                          color="error"
+                          size="small"
+                          onClick={() => {
+                            handleDelete(patient.id);
+                          }}
+                        >
+                          Remove
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Box>
+
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
           count={patients.length}
           rowsPerPage={rowsPerPage}
           page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
+          onPageChange={(e, p) => setPage(p)}
+          onRowsPerPageChange={(e) => {
+            setRowsPerPage(parseInt(e.target.value, 10));
+            setPage(0);
+          }}
         />
+
         <Button
           variant="contained"
-          color="primary"
-          style={{ marginTop: "20px" }}
-
-          onClick={() => {
-            navigate('/admin/add-patient')
-          }}
-
+          color="success"
+          sx={{ mt: 3, float: "right" }}
+          onClick={() => navigate("/info-patient")}
         >
           Add Patient
         </Button>

@@ -125,3 +125,21 @@ input:focus {
     width: 50%;
   }
 }
+.no-account {
+  margin-top: 15px;
+  text-align: center;
+  color: #555;
+  font-size: 14px;
+}
+
+.register-link {
+  color: #0f7378;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.register-link:hover {
+  color: #3a8f94;
+  text-decoration: underline;
+}
