@@ -17,7 +17,7 @@ import {
 import user from "../../assests/user.png";
 import {  getDoctorById, getScheduleOfDoctor } from "../../services/DoctorServicce";
 import { toast } from "react-toastify";
-import { postScheduleOfPatient } from "../../services/PatientService";
+import { getPatientIdByUserId, postScheduleOfPatient } from "../../services/PatientService";
 
 const BookingPage = () => {
   const params = useParams();
@@ -33,7 +33,7 @@ const userId = user?.id;
   const [reason, setReason] = useState("");
   const [notes, setNotes] = useState("");
   const [isAvailable, setIsAvailable] = useState(false);
-
+  const [id, setId] = useState(null)
   const disabledHours = () => {
   const hours = Array.from({ length: 24 }, (_, i) => i);
 
@@ -49,14 +49,18 @@ const userId = user?.id;
 
   const fetchScheduleDoctor = async () => {
     const res = await getScheduleOfDoctor(params.id);
-    console.log(res, "sche");
-    
     if (res)   setDoctorSchedule(res?.schedules ?? []);
   };
+
+  const fetchPatient = async () => {
+    const res = await getPatientIdByUserId(userId);
+    if (res) setId(res.data.id)
+  }
 
   useEffect(() => {
     fetchDoctor();
     fetchScheduleDoctor();
+    fetchPatient();
   }, []);
 
   // Chuyển date + time sang format API
@@ -66,7 +70,6 @@ const userId = user?.id;
     : null;
 
   const handleAvailability = () => {
-    console.log(date,doctorSchedule.work_date );
     
 const isValidDate = doctorSchedule.some(
   (sch) => sch.work_date === appointment_date_convert
@@ -82,12 +85,11 @@ if (!isValidDate) {
     
     setIsAvailable(true);
     message.success("Slot Available!");
-    console.log({ appointment_date, time_slot, reason, notes });
   };
 
   const handleBooking = async() => {
      const data = {
-      patient: userId,
+      patient: id,
       doctor: params.id,
       appointment_date: appointment_date_convert,
       time_slot: time_slot_convert,
@@ -95,13 +97,24 @@ if (!isValidDate) {
       notes: notes
     }
         console.log(data);
-    const res = await postScheduleOfPatient(data)
+    try {
+    const res = await postScheduleOfPatient(data);
     console.log(res);
-    if (res && res.message === true){
-      toast.success("Đặt lịch khám thành công!")
-    }else {
-      toast.error("Giờ khám trùng! Vui lòng đặt giờ khác")
+
+    if (res?.success === true) {
+      toast.success(res.message);
+    } else {
+      toast.error(res?.data?.message || "Lỗi không xác định");
     }
+
+  } catch (error) {
+    // lấy lỗi backend trả về
+    const msg = error.response?.data?.errors?.non_field_errors?.[0]
+             || error.response?.data?.message
+             || "Đã xảy ra lỗi";
+
+    toast.error(msg);
+  }
     
   };
 
@@ -170,13 +183,13 @@ if (!isValidDate) {
             {doctorSchedule.map((schedule) => (
   <Grid container spacing={2} key={schedule.id} sx={{ mb: 1 }}>
     <Grid item xs={6}>
-      <Typography>
-        <strong>Work Date:</strong> {schedule.work_date}
+      <Typography style={{color: "red"}}>
+        <strong style={{color: "black"}}>Work Date:</strong> {schedule.work_date}
       </Typography>
     </Grid>
     <Grid item xs={6}>
-      <Typography>
-        <strong>Shift:</strong> {schedule.start_time} → {schedule.end_time}
+      <Typography style={{color: "red"}}>
+        <strong style={{color: "black"}}>Shift:</strong> {schedule.start_time} → {schedule.end_time}
       </Typography>
     </Grid>
   </Grid>

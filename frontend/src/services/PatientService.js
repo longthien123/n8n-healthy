@@ -23,6 +23,9 @@ const editPatient = (data, id) => {
 const deletePatient = (id) => {
   return axios.delete(`users/patients/${id}/delete/`);
 };
+const getPatientIdByUserId = (id) => {
+    return axios.get(`users/patient/user/${id}`)
+}
 //đặt lịch
 const postScheduleOfPatient = (data) => {
     return axios.post(`/appointments/appointments/create/`, {
@@ -34,4 +37,4 @@ const postScheduleOfPatient = (data) => {
       notes: data.notes
     })
 }
-export { getPatient, getPatientById, editPatient, deletePatient, postScheduleOfPatient };
+export { getPatient, getPatientById, editPatient, deletePatient, postScheduleOfPatient, getPatientIdByUserId };
