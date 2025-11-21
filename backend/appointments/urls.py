@@ -21,7 +21,8 @@ urlpatterns = [
     path('appointments/<int:pk>/update/', views.update_appointment, name='update_appointment'),
     path('appointments/<int:pk>/cancel/', views.cancel_appointment, name='cancel_appointment'),
     path('appointments/<int:pk>/reminder/', views.toggle_appointment_reminder, name='toggle_appointment_reminder'),
-    
+    path('appointments/<int:doctor_id>/week/', views.get_doctor_week_schedules, name='get_doctor_week_schedules'),
+
     # Special appointment endpoints
     path('appointments/available-slots/', views.get_available_time_slots, name='get_available_time_slots'),
 ]
