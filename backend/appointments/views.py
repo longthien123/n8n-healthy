@@ -4,13 +4,18 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from datetime import date, datetime
-from .models import DoctorSchedule
+from .models import DoctorSchedule, Appointment
 from .serializers import (
     DoctorScheduleSerializer, 
     DoctorScheduleCreateSerializer,
-    DoctorScheduleUpdateSerializer
+    DoctorScheduleUpdateSerializer,
+    AppointmentSerializer,
+    AppointmentCreateSerializer,
+    AppointmentUpdateSerializer,
+    AppointmentCancelSerializer,
+    AppointmentReminderSerializer
 )
-from users.models import Doctor
+from users.models import Doctor, Patient
 
 # Create your views here.
 
@@ -203,3 +208,255 @@ def get_available_doctors_by_date(request):
         'data': serializer.data,
         'count': schedules.count()
     })
+
+# ===== APPOINTMENT VIEWS =====
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def create_appointment(request):
+    """
+    API đặt lịch khám cho bệnh nhân - tự động set reminder_enabled = False
+    """
+    serializer = AppointmentCreateSerializer(data=request.data)
+    if serializer.is_valid():
+        appointment = serializer.save()
+        response_data = AppointmentSerializer(appointment).data
+        return Response({
+            'success': True,
+            'message': 'Đặt lịch khám thành công',
+            'data': response_data
+        }, status=status.HTTP_201_CREATED)
+    
+    return Response({
+        'success': False,
+        'message': 'Dữ liệu không hợp lệ',
+        'errors': serializer.errors
+    }, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def list_appointments(request):
+    """
+    API lấy danh sách lịch khám
+    Có thể lọc theo patient_id, doctor_id, appointment_date, status, reminder_enabled
+    """
+    appointments = Appointment.objects.select_related('patient__user', 'doctor__user').all()
+    
+    # Lọc theo patient_id
+    patient_id = request.GET.get('patient_id')
+    if patient_id:
+        appointments = appointments.filter(patient_id=patient_id)
+    
+    # Lọc theo doctor_id
+    doctor_id = request.GET.get('doctor_id')
+    if doctor_id:
+        appointments = appointments.filter(doctor_id=doctor_id)
+    
+    # Lọc theo ngày
+    appointment_date = request.GET.get('appointment_date')
+    if appointment_date:
+        try:
+            appointment_date = datetime.strptime(appointment_date, '%Y-%m-%d').date()
+            appointments = appointments.filter(appointment_date=appointment_date)
+        except ValueError:
+            return Response({
+                'success': False,
+                'message': 'Định dạng ngày không hợp lệ. Sử dụng YYYY-MM-DD'
+            }, status=status.HTTP_400_BAD_REQUEST)
+    
+    # Lọc theo trạng thái
+    status_filter = request.GET.get('status')
+    if status_filter:
+        appointments = appointments.filter(status=status_filter)
+    
+    # Lọc theo nhắc nhở
+    reminder_filter = request.GET.get('reminder_enabled')
+    if reminder_filter is not None:
+        reminder_enabled = reminder_filter.lower() == 'true'
+        appointments = appointments.filter(reminder_enabled=reminder_enabled)
+    
+    # Sắp xếp
+    appointments = appointments.order_by('-appointment_date', 'time_slot')
+    
+    serializer = AppointmentSerializer(appointments, many=True)
+    return Response({
+        'success': True,
+        'data': serializer.data,
+        'count': appointments.count()
+    })
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_appointment(request, pk):
+    """
+    API lấy chi tiết lịch khám
+    """
+    appointment = get_object_or_404(Appointment, pk=pk)
+    serializer = AppointmentSerializer(appointment)
+    return Response({
+        'success': True,
+        'data': serializer.data
+    })
+
+@api_view(['PUT', 'PATCH'])
+@permission_classes([AllowAny])
+def update_appointment(request, pk):
+    """
+    API sửa lịch khám
+    """
+    appointment = get_object_or_404(Appointment, pk=pk)
+    
+    serializer = AppointmentUpdateSerializer(
+        appointment,
+        data=request.data,
+        partial=request.method == 'PATCH'
+    )
+    
+    if serializer.is_valid():
+        serializer.save()
+        response_data = AppointmentSerializer(appointment).data
+        return Response({
+            'success': True,
+            'message': 'Cập nhật lịch khám thành công',
+            'data': response_data
+        })
+    
+    return Response({
+        'success': False,
+        'message': 'Dữ liệu không hợp lệ',
+        'errors': serializer.errors
+    }, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def cancel_appointment(request, pk):
+    """
+    API hủy lịch khám - tự động tắt nhắc nhở
+    """
+    appointment = get_object_or_404(Appointment, pk=pk)
+    
+    serializer = AppointmentCancelSerializer(instance=appointment, data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        response_data = AppointmentSerializer(appointment).data
+        return Response({
+            'success': True,
+            'message': 'Hủy lịch khám thành công',
+            'data': response_data
+        })
+    
+    return Response({
+        'success': False,
+        'message': 'Không thể hủy lịch khám',
+        'errors': serializer.errors
+    }, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def toggle_appointment_reminder(request, pk):
+    """
+    API bật/tắt nhắc nhở cho lịch khám
+    """
+    appointment = get_object_or_404(Appointment, pk=pk)
+    
+    serializer = AppointmentReminderSerializer(
+        appointment,
+        data=request.data,
+        partial=True
+    )
+    
+    if serializer.is_valid():
+        serializer.save()
+        response_data = AppointmentSerializer(appointment).data
+        status_text = "Bật" if appointment.reminder_enabled else "Tắt"
+        return Response({
+            'success': True,
+            'message': f'{status_text} nhắc nhở thành công',
+            'data': response_data
+        })
+    
+    return Response({
+        'success': False,
+        'message': 'Không thể thay đổi cài đặt nhắc nhở',
+        'errors': serializer.errors
+    }, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_available_time_slots(request):
+    """
+    API lấy khung giờ trống của bác sĩ trong ngày
+    """
+    doctor_id = request.GET.get('doctor_id')
+    appointment_date = request.GET.get('date')
+    
+    if not doctor_id or not appointment_date:
+        return Response({
+            'success': False,
+            'message': 'Vui lòng cung cấp doctor_id và date'
+        }, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        doctor = Doctor.objects.get(id=doctor_id)
+        appointment_date = datetime.strptime(appointment_date, '%Y-%m-%d').date()
+    except (Doctor.DoesNotExist, ValueError):
+        return Response({
+            'success': False,
+            'message': 'Bác sĩ không tồn tại hoặc định dạng ngày không hợp lệ'
+        }, status=status.HTTP_400_BAD_REQUEST)
+    
+    # Kiểm tra bác sĩ có lịch làm việc không
+    doctor_schedule = DoctorSchedule.objects.filter(
+        doctor=doctor,
+        work_date=appointment_date,
+        status__in=[DoctorSchedule.Status.SCHEDULED, DoctorSchedule.Status.ACTIVE]
+    ).first()
+    
+    if not doctor_schedule:
+        return Response({
+            'success': False,
+            'message': f'Bác sĩ {doctor.user.full_name} không có lịch làm việc ngày {appointment_date}'
+        }, status=status.HTTP_404_NOT_FOUND)
+    
+    # Lấy các khung giờ đã đặt
+    booked_slots = Appointment.objects.filter(
+        doctor=doctor,
+        appointment_date=appointment_date,
+        status__in=[Appointment.Status.SCHEDULED, Appointment.Status.CONFIRMED]
+    ).values_list('time_slot', flat=True)
+    
+    # Tất cả khung giờ có thể
+    all_slots = [choice[0] for choice in Appointment.TimeSlot.choices]
+    
+    # Khung giờ trống
+    available_slots = [
+        {
+            'time_slot': slot,
+            'display': dict(Appointment.TimeSlot.choices)[slot]
+        }
+        for slot in all_slots if slot not in booked_slots
+    ]
+    
+    return Response({
+        'success': True,
+        'doctor': doctor.user.full_name,
+        'date': appointment_date,
+        'doctor_schedule': {
+            'start_time': doctor_schedule.start_time,
+            'end_time': doctor_schedule.end_time
+        },
+        'available_slots': available_slots,
+        'count': len(available_slots)
+    })
+
+@api_view(['DELETE'])
+@permission_classes([AllowAny])
+def delete_appointment(request, pk):
+    """
+    API xóa lịch khám (chỉ admin)
+    """
+    appointment = get_object_or_404(Appointment, pk=pk)
+    appointment.delete()
+    return Response({
+        'success': True,
+        'message': 'Xóa lịch khám thành công'
+    }, status=status.HTTP_204_NO_CONTENT)
