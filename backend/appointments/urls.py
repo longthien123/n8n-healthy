@@ -8,6 +8,7 @@ urlpatterns = [
     path('schedules/<int:pk>/', views.get_doctor_schedule, name='get_doctor_schedule'),
     path('schedules/<int:pk>/update/', views.update_doctor_schedule, name='update_doctor_schedule'),
     path('schedules/<int:pk>/delete/', views.delete_doctor_schedule, name='delete_doctor_schedule'),
+    path('schedules/<int:doctor_id>/week/', views.get_doctor_week_schedules, name='get_doctor_week_schedules'),
     
     # Special schedule endpoints
     path('schedules/doctor/<int:doctor_id>/today/', views.get_doctor_today_schedule, name='get_doctor_today_schedule'),
