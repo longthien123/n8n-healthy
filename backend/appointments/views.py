@@ -509,3 +509,45 @@ def get_doctor_week_schedules(request, doctor_id):
         'schedules': serializer.data,
         'count': schedules.count()
     })
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_doctor_week_schedules(request, doctor_id):
+    """
+    API hiển thị lịch khám theo tuần của doctor
+    """
+    try:
+        from appointments.models import DoctorSchedule
+        from appointments.serializers import DoctorScheduleSerializer
+        from datetime import timedelta, date
+        
+        doctor = Doctor.objects.select_related('user').get(id=doctor_id)
+        
+        # Lấy tuần hiện tại
+        today = date.today()
+        start_of_week = today - timedelta(days=today.weekday())
+        end_of_week = start_of_week + timedelta(days=6)
+        
+        # Lấy lịch trình trong tuần
+        schedules = DoctorSchedule.objects.filter(
+            doctor=doctor,
+            work_date__gte=start_of_week,
+            work_date__lte=end_of_week
+        ).order_by('work_date', 'start_time')
+        
+        serializer = DoctorScheduleSerializer(schedules, many=True)
+        
+        return Response({
+            'success': True,
+            'doctor_id': doctor.id,
+            'doctor_name': doctor.user.full_name,
+            'week_range': f"{start_of_week} đến {end_of_week}",
+            'schedules': serializer.data,
+            'count': schedules.count()
+        })
+        
+    except Doctor.DoesNotExist:
+        return Response({
+            'success': False,
+            'message': f'Bác sĩ với ID {doctor_id} không tồn tại'
+        }, status=status.HTTP_404_NOT_FOUND)

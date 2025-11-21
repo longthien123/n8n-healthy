@@ -260,3 +260,37 @@ def create_admin(request):
         'message': 'Dữ liệu không hợp lệ',
         'errors': serializer.errors
     }, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_patient_by_user_id(request, user_id):
+    """
+    API hiển thị patient theo ID user
+    """
+    try:
+        user = User.objects.get(id=user_id)
+        
+        if not user.is_patient:
+            return Response({
+                'success': False,
+                'message': f'User ID {user_id} không phải là bệnh nhân'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        patient = Patient.objects.select_related('user').get(user=user)
+        serializer = PatientSerializer(patient)
+        
+        return Response({
+            'success': True,
+            'data': serializer.data
+        })
+        
+    except User.DoesNotExist:
+        return Response({
+            'success': False,
+            'message': f'User với ID {user_id} không tồn tại'
+        }, status=status.HTTP_404_NOT_FOUND)
+    except Patient.DoesNotExist:
+        return Response({
+            'success': False,
+            'message': f'Không tìm thấy thông tin bệnh nhân cho User ID {user_id}'
+        }, status=status.HTTP_404_NOT_FOUND)

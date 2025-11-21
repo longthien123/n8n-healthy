@@ -25,4 +25,5 @@ urlpatterns = [
     path('patients/<int:pk>/', views.get_patient, name='get_patient'),
     path('patients/<int:pk>/update/', views.update_patient, name='update_patient'),
     path('patients/<int:pk>/delete/', views.delete_patient, name='delete_patient'),
+    path('patient/user/<int:user_id>/', views.get_patient_by_user_id, name='get_patient_by_user_id'),
 ]
