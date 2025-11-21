@@ -1,0 +1,15 @@
+🚀 Bắt đầu test reminders...
+
+📅 Test nhắc lịch buổi SÁNG ngày mai:
+🔍 Kiểm tra: Trần Thị B - BS.BS. Nguyễn Văn A - 08:00-09:00
+📤 Gửi webhook (Nhắc buổi sáng)
+  ✅ Webhook thành công
+🔍 Kiểm tra: Ngo Thanh Tuan - BS.BS. Nguyễn Văn A - 10:00-11:00
+📤 Gửi webhook (Nhắc buổi sáng)
+  ✅ Webhook thành công
+📊 Đã xử lý 2 lịch hẹn buổi sáng
+
+🌅 Test nhắc lịch buổi CHIỀU hôm nay:
+📊 Đã xử lý 0 lịch hẹn buổi chiều
+
+✅ Test hoàn thành!

@@ -1,4 +1,5 @@
 from django.shortcuts import render, get_object_or_404
+import requests
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -11,6 +12,13 @@ from .serializers import (
 )
 from .models import User, Doctor, Patient
 from django.views.decorators.csrf import csrf_exempt
+
+# --- IMPORTS CHO VIỆC KÍCH HOẠT TÀI KHOẢN ---
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_str
+from .tokens import account_activation_token # Import file vừa tạo ở Bước 1
+from django.conf import settings # Để lấy domain nếu có cấu hình
+
 
 # ===== USER VIEWS =====
 @csrf_exempt
@@ -164,17 +172,85 @@ def delete_doctor(request, pk):
         'message': 'Xóa bác sĩ thành công'
     }, status=status.HTTP_204_NO_CONTENT)
 
+# ===== ACTIVATION VIEW (Thêm mới) =====
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def activate_account(request, uidb64, token):
+    """API xử lý link kích hoạt từ Email"""
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+
+    if user is not None and account_activation_token.check_token(user, token):
+        # Token hợp lệ -> Kích hoạt tài khoản
+        user.is_active = True
+        user.save()
+        
+        # Cách 1: Redirect thẳng về trang Login của React Frontend
+        # return redirect('http://localhost:3000/login?status=activated')
+        
+        # Cách 2: Trả về JSON thông báo (Nếu muốn hiển thị giao diện từ backend hoặc test Postman)
+        return Response({
+            'success': True,
+            'message': 'Kích hoạt tài khoản thành công! Bạn có thể đăng nhập ngay bây giờ.'
+        }, status=status.HTTP_200_OK)
+        
+    else:
+        return Response({
+            'success': False,
+            'message': 'Link kích hoạt không hợp lệ hoặc đã hết hạn.'
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+
+
 # ===== PATIENT VIEWS =====
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def create_patient(request):
-    """API tạo bệnh nhân mới"""
+    """API tạo bệnh nhân mới với xác thực Email qua n8n"""
     serializer = PatientSerializer(data=request.data)
     if serializer.is_valid():
+        # 1. Lưu Patient và User (Lúc này user.is_active mặc định là True)
         patient = serializer.save()
+        user = patient.user # Lấy user liên kết với bệnh nhân này
+        
+        # 2. Deactivate tài khoản ngay lập tức
+        user.is_active = False
+        user.save()
+
+        # 3. Tạo Link kích hoạt
+        # Mã hóa User ID và tạo Token
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        token = account_activation_token.make_token(user)
+        
+        # Tạo đường dẫn đầy đủ (Thay đổi domain localhost bằng domain thật khi deploy)
+        # Ví dụ: http://127.0.0.1:8000/api/activate/MQ/bv2-321.../
+        domain = "http://127.0.0.1:8000" 
+        activation_link = f"{domain}/api/users/activate/{uid}/{token}/"
+
+        # 4. Gửi Webhook sang n8n
+        # Đây là URL Webhook bạn lấy từ n8n Node
+        n8n_webhook_url = "http://localhost:5678/webhook/send-activation-email" 
+        
+        payload = {
+            "email": user.email,
+            "full_name": f"{user.full_name}",
+            "activation_link": activation_link
+        }
+
+        try:
+            # Gửi request sang n8n (timeout 3s để không treo server nếu n8n chậm)
+            requests.post(n8n_webhook_url, json=payload, timeout=3)
+        except requests.exceptions.RequestException as e:
+            print(f"Lỗi gửi webhook sang n8n: {e}")
+            # Có thể log lỗi nhưng vẫn trả về thành công cho User biết để check mail
+        
         return Response({
             'success': True,
-            'message': 'Tạo bệnh nhân thành công',
+            'message': 'Đăng ký thành công! Vui lòng kiểm tra email để kích hoạt tài khoản.',
             'data': PatientSerializer(patient).data
         }, status=status.HTTP_201_CREATED)
     

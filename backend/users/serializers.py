@@ -167,7 +167,8 @@ class PatientSerializer(serializers.ModelSerializer):
             'email': validated_data.pop('email'),
             'full_name': validated_data.pop('full_name'),
             'phone': validated_data.pop('phone', ''),
-            'role': User.Role.PATIENT
+            'role': User.Role.PATIENT,
+            'is_active': False # Mặc định tài khoản bệnh nhân chưa kích hoạt
         }
         
         # Tạo user (create_user đã tự động hash password)
