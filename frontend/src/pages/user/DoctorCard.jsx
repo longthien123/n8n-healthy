@@ -1,78 +1,114 @@
 import React, { useEffect, useState } from "react";
-import { List, ListItem, ListItemText, Button, Box, Avatar } from "@mui/material";
-import axios from "axios";
+import {
+  Grid,
+  Card,
+  CardContent,
+  Typography,
+  Button,
+  Avatar,
+  Box,
+} from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import maleAvatar from '../../assests/male-avatar.jpg';
-import femaleAvatar from '../../assests/female-avatar.jpg';
+import maleAvatar from "../../assests/male-avatar.jpg";
+import femaleAvatar from "../../assests/female-avatar.jpg";
+import { getAllDoctor } from "../../services/DoctorServicce";
 
-
-const DoctorCard = () => {
+const DoctorGrid = () => {
   const navigate = useNavigate();
   const [doctorData, setDoctorData] = useState([]);
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       const response = await axios.get("http://localhost:3001/doctor/all");
-  //       setDoctorData(response.data.data.doctors);
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-  //   };
-
-  //   fetchData();
-  // }, []);
-
-  const getAvatarSrc = (gender) => {
-    if (gender === "male") {
-      return maleAvatar;
-    } else {
-      return femaleAvatar;
+  const fetchDoctor = async () => {
+    const res = await getAllDoctor();
+    console.log(res);
+    
+    if (res) {
+      setDoctorData(res.data);
     }
   };
 
+  useEffect(() => {
+    fetchDoctor();
+  }, []);
+
+  const getAvatarSrc = (gender) => (gender === "MALE" ? maleAvatar : femaleAvatar);
+
   return (
-    <div>
-      <List sx={{ minHeight: "100vh" }}>
+    <Box sx={{ padding: "30px" }}>
+      <Typography
+        variant="h4"
+        sx={{ fontWeight: "bold", color: "#002D62", mb: 3, textAlign: "center" }}
+      >
+        Doctors Directory
+      </Typography>
+
+      <Grid container spacing={3}>
         {doctorData.map((doctor) => (
-          <ListItem
-            key={doctor.doctorNo}
-            sx={{
-      
-              height :"130px",
-              margin:"10px 0px",
-              backgroundColor: "#04619f",
-              backgroundImage: "linear-gradient(147deg, #04619f 0%, #002D62 74%)",
-              color: "white",
-              transition: "transform 0.2s",
-              "&:hover": {
-                transform: "scale(1.05)",
-              },
-              borderTop: "1px solid white",
-              alignItems: "center",
-            }}
-          >
-            <Avatar src={getAvatarSrc(doctor.Gender)} alt="Doctor Avatar" sx={{ marginRight: "1rem" }} />
-            <ListItemText primary={doctor.fullname} secondary={doctor.Specialty} />
-            <Box sx={{ flexGrow: 1 }} />
-            <Button
-              variant="contained"
-              color="secondary"
+          <Grid item xs={12} sm={6} md={4} lg={3} key={doctor.doctorNo}>
+            <Card
               sx={{
-                backgroundColor: "#005A9C",
+                borderRadius: "15px",
+                boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                padding: "20px",
+                textAlign: "center",
+                transition: "0.3s",
                 "&:hover": {
-                  backgroundColor: "#1F305E",
+                  transform: "translateY(-7px)",
+                  boxShadow: "0 8px 20px rgba(0,0,0,0.2)",
                 },
               }}
-              onClick={() => navigate(`/doctors/book-appoinment/${doctor.doctorNo}`)}
             >
-              Details
-            </Button>
-          </ListItem>
+              <Avatar
+                src={getAvatarSrc(doctor.Gender)}
+                alt="Doctor Avatar"
+                sx={{
+                  width: 90,
+                  height: 90,
+                  margin: "0 auto",
+                  border: "3px solid #002D62",
+                  mb: 2,
+                }}
+              />
+
+              <CardContent>
+                <Typography variant="h6" sx={{ fontWeight: "bold", color: "#002D62" }}>
+                  {doctor.fullname}
+                </Typography>
+
+                <Typography variant="body2" sx={{ mt: 1, color: "#444" }}>
+                  📞 {doctor.phone}
+                </Typography>
+
+                <Typography
+                  variant="body2"
+                  sx={{ mt: 1, color: "#1F75FE", fontWeight: "bold" }}
+                >
+                  🩺 {doctor.Specialty}
+                </Typography>
+
+                <Button
+                  variant="contained"
+                  sx={{
+                    mt: 2,
+                    backgroundColor: "#04619f",
+                    padding: "6px 20px",
+                    borderRadius: "10px",
+                    textTransform: "none",
+                    fontWeight: "bold",
+                    "&:hover": { backgroundColor: "#002D62" },
+                  }}
+                  onClick={() =>
+                    navigate(`/doctors/book-appoinment/${doctor.doctorNo}`)
+                  }
+                >
+                  View Details
+                </Button>
+              </CardContent>
+            </Card>
+          </Grid>
         ))}
-      </List>
-    </div>
+      </Grid>
+    </Box>
   );
 };
 
-export default DoctorCard;
+export default DoctorGrid;

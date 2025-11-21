@@ -22,7 +22,7 @@ function Navbar() {
 				<a href="/doctors">Doctors</a>
 				<a href="/#">Blog</a>
 				<a href="/#">About me</a>
-				<div className="navbar">
+				<div className="navbar1">
 					{isLoggedIn ? (
 						<button className="Nav-login" onClick={() => {
 							localStorage.clear();
