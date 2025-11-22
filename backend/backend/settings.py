@@ -1,6 +1,9 @@
 from pathlib import Path
 import os
 
+USE_TZ = True
+TIME_ZONE = 'Asia/Ho_Chi_Minh'
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get('DJANGO_SECRET', 'dev-secret')
@@ -74,7 +77,6 @@ AUTH_PASSWORD_VALIDATORS = []
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
 
 USE_I18N = True
 

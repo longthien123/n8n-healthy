@@ -22,8 +22,23 @@ class Command(BaseCommand):
             action='store_true',
             help='Chạy test mode - gửi webhook ngay lập tức'
         )
+        parser.add_argument(
+            '--reset',
+            action='store_true',
+            help='Reset reminder_enabled về False để test lại'
+        )
 
     def handle(self, *args, **options):
+        # Reset reminder_enabled nếu có flag --reset
+        if options['reset']:
+            reset_count = Appointment.objects.filter(
+                reminder_enabled=True
+            ).update(reminder_enabled=False)
+            self.stdout.write(
+                self.style.SUCCESS(f"🔄 Đã reset {reset_count} lịch hẹn về reminder_enabled=False")
+            )
+            return
+
         today = timezone.localdate()
         tomorrow = today + timedelta(days=1)
 
@@ -112,7 +127,10 @@ class Command(BaseCommand):
 
         # Chuẩn bị dữ liệu gửi
         appointments_data = []
+        appointment_ids = []
+        
         for appt in appointments:
+            appointment_ids.append(appt.id)
             appointments_data.append({
                 "id": appt.id,
                 "date": str(appt.appointment_date),
@@ -134,59 +152,118 @@ class Command(BaseCommand):
         }
 
         self.stdout.write(f"📤 Đang gửi {len(appointments_data)} lịch hẹn đến webhook...")
+        self.stdout.write("⏳ Đang chờ n8n xử lý và trả về response...")
         
-        # Gửi webhook
-        success = self.send_to_n8n(payload)
+        # Gửi webhook và nhận response
+        webhook_response = self.send_to_n8n(payload)
         
-        if success:
-            # Cập nhật reminder_enabled = True cho tất cả lịch đã gửi
-            appointment_ids = [appt.id for appt in appointments]
-            updated_count = Appointment.objects.filter(
-                id__in=appointment_ids
-            ).update(reminder_enabled=True)
+        # Kiểm tra response từ webhook
+        if webhook_response is not None:
+            success = webhook_response.get('output', False)
             
-            self.stdout.write(
-                self.style.SUCCESS(
-                    f"✅ Gửi thành công! Đã cập nhật reminder_enabled cho {updated_count} lịch hẹn"
-                )
-            )
-            
-            # In chi tiết
-            for appt in appointments:
+            if success:
+                # Cập nhật reminder_enabled = True cho tất cả lịch đã gửi
+                updated_count = Appointment.objects.filter(
+                    id__in=appointment_ids
+                ).update(reminder_enabled=True)
+                
                 self.stdout.write(
-                    f"  📋 ID {appt.id}: {appt.patient.user.full_name} ({appt.patient.user.email}) - {appt.time_slot} - {appt.reason or 'Không ghi chú'}"
+                    self.style.SUCCESS(
+                        f"✅ n8n trả về success=True! Đã cập nhật reminder_enabled=True cho {updated_count} lịch hẹn"
+                    )
                 )
+                
+                # In chi tiết các lịch đã cập nhật
+                self.stdout.write("\n📋 Chi tiết các lịch hẹn đã xử lý:")
+                for appt in appointments:
+                    self.stdout.write(
+                        f"  ✉️  ID {appt.id}: {appt.patient.user.full_name} ({appt.patient.user.email}) - {appt.time_slot}"
+                    )
+            else:
+                # n8n trả về success=False
+                error_message = webhook_response.get('message', 'Không có thông tin lỗi')
+                self.stdout.write(
+                    self.style.ERROR(
+                        f"❌ n8n trả về success=False: {error_message}\n"
+                        f"   Không cập nhật reminder_enabled"
+                    )
+                )
+                
+                # In danh sách các lịch không xử lý được
+                self.stdout.write("\n📋 Các lịch hẹn KHÔNG được xử lý:")
+                for appt in appointments:
+                    self.stdout.write(
+                        f"  ❌ ID {appt.id}: {appt.patient.user.full_name} ({appt.patient.user.email})"
+                    )
         else:
+            # Không nhận được response từ webhook
             self.stdout.write(
-                self.style.ERROR("❌ Gửi webhook thất bại - không cập nhật reminder_enabled")
+                self.style.ERROR(
+                    f"❌ Không nhận được response từ webhook\n"
+                    f"   Không cập nhật reminder_enabled"
+                )
             )
 
     def send_to_n8n(self, payload):
-        """Gửi dữ liệu đến n8n webhook"""
+        """
+        Gửi dữ liệu đến n8n webhook và nhận response
+        Trả về: dict response từ webhook hoặc None nếu lỗi
+        """
         url = "http://localhost:5678/webhook/send-reminders"
         
         try:
-            response = requests.post(url, json=payload, timeout=10)
+            # Tăng timeout lên 120 giây để chờ n8n xử lý (gửi email)
+            response = requests.post(url, json=payload, timeout=120)
             
             if response.status_code == 200:
-                self.stdout.write(f"  ✅ Webhook thành công - Status: {response.status_code}")
-                return True
+                self.stdout.write(f"  ✅ Nhận được response từ webhook - Status: {response.status_code}")
+                
+                try:
+                    # Parse JSON response từ webhook
+                    response_data = response.json()
+                    self.stdout.write(f"  📥 Response data: {response_data}")
+                    return response_data
+                    
+                except ValueError:
+                    self.stdout.write(
+                        self.style.WARNING("  ⚠️ Webhook không trả về JSON hợp lệ")
+                    )
+                    return None
             else:
                 self.stdout.write(
                     self.style.WARNING(
                         f"  ⚠️ Webhook lỗi - Status: {response.status_code}, Response: {response.text}"
                     )
                 )
-                return False
+                return None
                 
+        except requests.exceptions.Timeout:
+            self.stdout.write(
+                self.style.ERROR(
+                    "  ❌ Timeout: Webhook không phản hồi trong 120 giây\n"
+                    "     n8n có thể đang xử lý nhưng mất quá nhiều thời gian"
+                )
+            )
+            return None
+            
+        except requests.exceptions.ConnectionError:
+            self.stdout.write(
+                self.style.ERROR(
+                    f"  ❌ Lỗi kết nối: Không thể kết nối đến webhook\n"
+                    f"     Kiểm tra n8n có đang chạy không? URL: {url}"
+                )
+            )
+            return None
+            
         except requests.exceptions.RequestException as e:
             self.stdout.write(
-                self.style.ERROR(f"  ❌ Lỗi kết nối webhook: {str(e)}")
+                self.style.ERROR(f"  ❌ Lỗi request webhook: {str(e)}")
             )
-            return False
+            return None
+            
         except Exception as e:
             self.stdout.write(
                 self.style.ERROR(f"  ❌ Lỗi không xác định: {str(e)}")
             )
-            return False
+            return None
 
