@@ -1,9 +1,7 @@
 import axios from "axios";
 import nProgress from "nprogress";
-
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/api/';
 const instance = axios.create({
-    baseURL: API_BASE_URL,
+    baseURL: 'http://127.0.0.1:8000/api/',
     // timeout: 1000,
     // headers: {'X-Custom-Header': 'foobar'}
 });
