@@ -228,7 +228,7 @@ def create_patient(request):
         
         # Tạo đường dẫn đầy đủ (Thay đổi domain localhost bằng domain thật khi deploy)
         # Ví dụ: http://127.0.0.1:8000/api/activate/MQ/bv2-321.../
-        domain = "http://127.0.0.1:8000" 
+        domain = "https://healthybackend.onrender.com" 
         activation_link = f"{domain}/api/users/activate/{uid}/{token}/"
 
         # 4. Gửi Webhook sang n8n
