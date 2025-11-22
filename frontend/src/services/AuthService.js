@@ -27,7 +27,7 @@ const patientRegister = (data) => {
     gender: data.gender,
     address: data.address,
     blood_type: data.blood_type,
-    patient_code: "PN"
+    patient_code: "PN" + Math.floor(100000 + Math.random() * 900000)
   })
 }
 export {
