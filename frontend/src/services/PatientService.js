@@ -37,4 +37,15 @@ const postScheduleOfPatient = (data) => {
       notes: data.notes
     })
 }
-export { getPatient, getPatientById, editPatient, deletePatient, postScheduleOfPatient, getPatientIdByUserId };
+//xác nhận đặt lịch 
+const postN8nScheduleOfPatient = (data) => {
+    return axios.post(`n8n/book/`, {
+       patient: data.patient,
+      doctor: data.doctor,
+      appointment_date: data.appointment_date,
+      time_slot: data.time_slot,
+      reason: data.reason,
+      notes: data.notes
+    })
+}
+export { getPatient, getPatientById, editPatient, deletePatient, postScheduleOfPatient, getPatientIdByUserId, postN8nScheduleOfPatient };

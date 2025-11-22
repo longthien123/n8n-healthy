@@ -17,7 +17,7 @@ import {
 import user from "../../assests/user.png";
 import {  getDoctorById, getScheduleOfDoctor } from "../../services/DoctorServicce";
 import { toast } from "react-toastify";
-import { getPatientIdByUserId, postScheduleOfPatient } from "../../services/PatientService";
+import { getPatientIdByUserId, postN8nScheduleOfPatient, postScheduleOfPatient } from "../../services/PatientService";
 
 const BookingPage = () => {
   const params = useParams();
@@ -102,6 +102,7 @@ if (!isValidDate) {
     console.log(res);
 
     if (res?.success === true) {
+      await postN8nScheduleOfPatient(data)
       toast.success(res.message);
     } else {
       toast.error(res?.data?.message || "Lỗi không xác định");
