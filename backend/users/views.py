@@ -233,7 +233,7 @@ def create_patient(request):
 
         # 4. Gửi Webhook sang n8n
         # Đây là URL Webhook bạn lấy từ n8n Node
-        n8n_webhook_url = "http://localhost:5678/webhook/send-activation-email" 
+        n8n_webhook_url = "https://longthien.duckdns.org/webhook/send-activation-email" 
         
         payload = {
             "email": user.email,
