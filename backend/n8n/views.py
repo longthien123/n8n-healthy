@@ -4,6 +4,7 @@ from rest_framework import status
 import requests
 from django.http import JsonResponse
 from django.core.management import call_command
+import io #
 
 # gọi n8n send email khi đặt lịch thành công
 @api_view(["POST"])
@@ -80,21 +81,30 @@ def send_booking_to_n8n(request):
 
 #Nhắc lịch trên n8n(gọi send_reminder)
 def trigger_reminders_view(request):
-    """
-    View này được gọi bởi n8n (tool) thông qua HTTP Request.
-    Nó sẽ kích hoạt lệnh management command 'send_reminders'.
-    """
+    # Tạo một đối tượng bộ đệm trong bộ nhớ để bắt output
+    output_buffer = io.StringIO()
+    
     try:
-        # Tên lệnh chính là tên file: send_reminders.py -> 'send_reminders'
-        # Django sẽ tự tìm trong thư mục management/commands của app 'n8n'
-        call_command('send_reminders') 
+        # Gọi lệnh management command và chuyển hướng stdout đến bộ đệm
+        # 'send_reminders' là tên lệnh
+        call_command('send_reminders', stdout=output_buffer) 
         
+        # Lấy toàn bộ nội dung log đã được bắt
+        command_output = output_buffer.getvalue()
+        
+        # Trả về kết quả cho n8n
         return JsonResponse({
             'status': 'success', 
-            'message': 'Đã chạy lệnh send_reminders'
+            'message': 'Đã chạy lệnh check giờ thành công.',
+            'log_output': command_output # <-- Đưa log vào đây
         })
+    
     except Exception as e:
+        # Nếu lệnh bị lỗi, vẫn lấy output log đến thời điểm lỗi
+        error_output = output_buffer.getvalue()
+        
         return JsonResponse({
             'status': 'error', 
-            'message': str(e)
+            'message': f"Lệnh bị lỗi: {str(e)}",
+            'log_output': error_output # <-- Trả về log trước khi lỗi
         }, status=500)
