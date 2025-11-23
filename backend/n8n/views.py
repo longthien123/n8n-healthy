@@ -81,30 +81,41 @@ def send_booking_to_n8n(request):
 
 #Nhắc lịch trên n8n(gọi send_reminder)
 def trigger_reminders_view(request):
-    # Tạo một đối tượng bộ đệm trong bộ nhớ để bắt output
+    
+    # 1. Kiểm tra tham số 'mode' từ URL (ví dụ: /api/cron-check/?mode=test)
+    mode = request.GET.get('mode', 'production') # Mặc định là 'production'
+    
+    # Chuẩn bị tham số cho call_command
+    args = []
+    options = {}
+    
+    if mode == 'test':
+        # Nếu mode là 'test', thêm cờ --test vào options
+        options['test'] = True
+    
+    # Tạo bộ đệm để bắt log output
     output_buffer = io.StringIO()
     
     try:
-        # Gọi lệnh management command và chuyển hướng stdout đến bộ đệm
-        # 'send_reminders' là tên lệnh
-        call_command('send_reminders', stdout=output_buffer) 
+        # 2. Gọi lệnh management command
+        # options={'test': True} sẽ tương đương với --test trên command line
+        call_command('send_reminders', *args, **options, stdout=output_buffer) 
         
-        # Lấy toàn bộ nội dung log đã được bắt
         command_output = output_buffer.getvalue()
         
-        # Trả về kết quả cho n8n
+        # 3. Trả về kết quả cho n8n
         return JsonResponse({
             'status': 'success', 
-            'message': 'Đã chạy lệnh check giờ thành công.',
-            'log_output': command_output # <-- Đưa log vào đây
+            'mode_ran': mode,
+            'log_output': command_output 
         })
     
     except Exception as e:
-        # Nếu lệnh bị lỗi, vẫn lấy output log đến thời điểm lỗi
         error_output = output_buffer.getvalue()
         
         return JsonResponse({
             'status': 'error', 
+            'mode_ran': mode,
             'message': f"Lệnh bị lỗi: {str(e)}",
-            'log_output': error_output # <-- Trả về log trước khi lỗi
+            'log_output': error_output 
         }, status=500)
