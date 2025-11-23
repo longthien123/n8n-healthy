@@ -2,6 +2,8 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 import requests
+from django.http import JsonResponse
+from django.core.management import call_command
 
 # gọi n8n send email khi đặt lịch thành công
 @api_view(["POST"])
@@ -69,3 +71,30 @@ def send_booking_to_n8n(request):
         return Response({"error": "Cannot send data to n8n", "details": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     return Response({"message": "Data sent to n8n successfully"}, status=status.HTTP_200_OK)
+
+
+
+
+
+
+
+#Nhắc lịch trên n8n(gọi send_reminder)
+def trigger_reminders_view(request):
+    """
+    View này được gọi bởi n8n (tool) thông qua HTTP Request.
+    Nó sẽ kích hoạt lệnh management command 'send_reminders'.
+    """
+    try:
+        # Tên lệnh chính là tên file: send_reminders.py -> 'send_reminders'
+        # Django sẽ tự tìm trong thư mục management/commands của app 'n8n'
+        call_command('send_reminders') 
+        
+        return JsonResponse({
+            'status': 'success', 
+            'message': 'Đã chạy lệnh send_reminders'
+        })
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error', 
+            'message': str(e)
+        }, status=500)
