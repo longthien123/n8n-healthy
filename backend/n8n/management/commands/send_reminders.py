@@ -209,7 +209,7 @@ class Command(BaseCommand):
         Gửi dữ liệu đến n8n webhook và nhận response
         Trả về: dict response từ webhook hoặc None nếu lỗi
         """
-        url = "http://localhost:5678/webhook/send-reminders"
+        url = "https://longthien.duckdns.org/webhook/send-reminders"
         
         try:
             # Tăng timeout lên 120 giây để chờ n8n xử lý (gửi email)
