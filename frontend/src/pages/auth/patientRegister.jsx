@@ -43,7 +43,7 @@ export default function PatientRegister() {
     
     const res = await patientRegister(data);    
       if (res && res.success === true) {
-            toast.success("Đăng ký thành công!");
+            toast.success("Đăng ký thành công! Vui lòng kiểm tra email để kích hoạt tài khoản.");
             navigate("/login");
           } else {
             toast.error(res?.message || "Đăng ký thất bại!");

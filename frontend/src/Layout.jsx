@@ -16,6 +16,7 @@ import DoctorScheduleList from "./pages/admin/DoctorScheduleList";
 import PatientRegister from "./pages/auth/patientRegister";
 import EditPatient from "./pages/admin/EditPatient";
 import CancelAppointment from "./components/CancelAppointment"; // THÊM IMPORT
+import ActivationResult from "./components/ActivationResult"; // THÊM IMPORT
 
 const  Layout = () => {
     
