@@ -28,4 +28,14 @@ urlpatterns = [
     path('patient/user/<int:user_id>/', views.get_patient_by_user_id, name='get_patient_by_user_id'),
     path('create_patient/', views.create_patient, name='create_patient'),
     path('activate/<uidb64>/<token>/', views.activate_account, name='activate'),
+
+    # 2. [QUAN TRỌNG] Các đường dẫn đặc biệt (Thêm mới vào đây)
+    # Phải đặt TRÊN dòng <int:pk> để không bị lỗi
+    path('patients/me/', views.get_my_patient_profile, name='my_patient_profile'),
+    path('patients/by-user/<int:user_id>/', views.get_patient_by_user_id, name='get_patient_by_user_id'),
+
+    # 3. Các đường dẫn tìm theo ID Bệnh nhân (Đặt dưới cùng)
+    path('patients/<int:pk>/', views.get_patient, name='get_patient'),
+    path('patients/<int:pk>/update/', views.update_patient, name='update_patient'),
+    path('patients/<int:pk>/delete/', views.delete_patient, name='delete_patient'),
 ]

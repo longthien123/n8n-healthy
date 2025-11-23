@@ -370,3 +370,51 @@ def get_patient_by_user_id(request, user_id):
             'success': False,
             'message': f'Không tìm thấy thông tin bệnh nhân cho User ID {user_id}'
         }, status=status.HTTP_404_NOT_FOUND)
+    
+
+
+# ===== MY PROFILE VIEWS =====
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated]) # Bắt buộc đăng nhập mới xem được
+def get_my_patient_profile(request):
+    """API lấy hồ sơ bệnh nhân của người đang đăng nhập"""
+    user = request.user
+    try:
+        # Tìm hồ sơ bệnh nhân gắn với user này
+        # Lưu ý: Nếu model Patient bạn để related_name khác thì sửa 'patient' thành tên đó
+        # Thường mặc định Django nối ngược qua user.patient (nếu OneToOneField không set related_name)
+        # Hoặc user.patient_set.first() nếu là ForeignKey
+        
+        # Cách an toàn nhất: Query trực tiếp bảng Patient
+        patient = Patient.objects.get(user=user) 
+        serializer = PatientSerializer(patient)
+        return Response({
+            'success': True,
+            'data': serializer.data
+        })
+    except Patient.DoesNotExist:
+        return Response({
+            'success': False,
+            'message': 'Người dùng này chưa tạo hồ sơ bệnh nhân'
+        }, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_patient_by_user_id(request, user_id):
+    """
+    API tìm hồ sơ bệnh nhân dựa theo user_id
+    """
+    try:
+        # Tìm trong bảng Patient xem dòng nào có user_id trùng khớp
+        patient = Patient.objects.get(user__id=user_id)
+        serializer = PatientSerializer(patient)
+        return Response({
+            'success': True,
+            'data': serializer.data
+        })
+    except Patient.DoesNotExist:
+        return Response({
+            'success': False,
+            'message': f'Không tìm thấy hồ sơ bệnh nhân nào gắn với User ID {user_id}'
+        }, status=status.HTTP_404_NOT_FOUND)
