@@ -18,7 +18,7 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
 from .tokens import account_activation_token # Import file vừa tạo ở Bước 1
 from django.conf import settings # Để lấy domain nếu có cấu hình
-
+from django.shortcuts import redirect
 
 # ===== USER VIEWS =====
 @csrf_exempt
@@ -189,21 +189,14 @@ def activate_account(request, uidb64, token):
         user.is_active = True
         user.save()
         
-        # Cách 1: Redirect thẳng về trang Login của React Frontend
-        # return redirect('http://localhost:3000/login?status=activated')
-        
-        # Cách 2: Trả về JSON thông báo (Nếu muốn hiển thị giao diện từ backend hoặc test Postman)
-        return Response({
-            'success': True,
-            'message': 'Kích hoạt tài khoản thành công! Bạn có thể đăng nhập ngay bây giờ.',
-            'close_tab': True  # Signal để frontend đóng tab
-        }, status=status.HTTP_200_OK)
+        # CHUYỂN HƯỚNG VỀ FRONTEND thay vì trả JSON
+        frontend_url = "https://healthyfronted.onrender.com/?action=activation&status=success"
+        return redirect(frontend_url)
         
     else:
-        return Response({
-            'success': False,
-            'message': 'Link kích hoạt không hợp lệ hoặc đã hết hạn.'
-        }, status=status.HTTP_400_BAD_REQUEST)
+        # Token không hợp lệ -> chuyển về frontend với status error
+        frontend_url = "https://healthyfronted.onrender.com/?action=activation&status=error"
+        return redirect(frontend_url)
 
 
 

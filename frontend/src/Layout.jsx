@@ -15,9 +15,23 @@ import EditDoctor from "./pages/admin/EditDoctor";
 import DoctorScheduleList from "./pages/admin/DoctorScheduleList";
 import PatientRegister from "./pages/auth/patientRegister";
 import EditPatient from "./pages/admin/EditPatient";
+import CancelAppointment from "./components/CancelAppointment"; // THÊM IMPORT
 
 const  Layout = () => {
-      return (
+    
+    // THÊM: Kiểm tra URL có action=cancel không
+    const urlParams = new URLSearchParams(window.location.search);
+    const action = urlParams.get('action');
+    
+    // Nếu có action=cancel thì hiển thị component hủy lịch
+    if (action === 'cancel') {
+        return <CancelAppointment />;
+    }
+    if (action === 'activation') {
+        return <ActivationResult />;
+    }
+      
+    return (
     <>
         <Routes>
             <Route path="login" element={<LoginForm />} />
