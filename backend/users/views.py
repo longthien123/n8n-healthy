@@ -195,7 +195,8 @@ def activate_account(request, uidb64, token):
         # Cách 2: Trả về JSON thông báo (Nếu muốn hiển thị giao diện từ backend hoặc test Postman)
         return Response({
             'success': True,
-            'message': 'Kích hoạt tài khoản thành công! Bạn có thể đăng nhập ngay bây giờ.'
+            'message': 'Kích hoạt tài khoản thành công! Bạn có thể đăng nhập ngay bây giờ.',
+            'close_tab': True  # Signal để frontend đóng tab
         }, status=status.HTTP_200_OK)
         
     else:

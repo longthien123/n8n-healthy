@@ -551,3 +551,41 @@ def get_doctor_week_schedules(request, doctor_id):
             'success': False,
             'message': f'Bác sĩ với ID {doctor_id} không tồn tại'
         }, status=status.HTTP_404_NOT_FOUND)
+    
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def cancel_appointment_by_id(request, appointment_id):
+    """
+    API hủy lịch hẹn theo ID - chuyển status sang CANCELLED
+    """
+    try:
+        appointment = Appointment.objects.get(id=appointment_id)
+    except Appointment.DoesNotExist:
+        return Response({
+            'success': False,
+            'message': f'Lịch hẹn với ID {appointment_id} không tồn tại'
+        }, status=status.HTTP_404_NOT_FOUND)
+    
+    # Kiểm tra có thể hủy không
+    if not appointment.can_cancel:
+        return Response({
+            'success': False,
+            'message': 'Không thể hủy lịch hẹn này (đã quá hạn hoặc trạng thái không phù hợp)'
+        }, status=status.HTTP_400_BAD_REQUEST)
+    
+    # Cập nhật trạng thái
+    appointment.status = Appointment.Status.CANCELLED
+    appointment.reminder_enabled = False  # Tự động tắt nhắc nhở
+    appointment.save()
+    
+    # Serialize dữ liệu trả về
+    serializer = AppointmentSerializer(appointment)
+    
+    return Response({
+        'success': True,
+        'message': 'Hủy lịch hẹn thành công',
+        'data': serializer.data,
+        'close_tab': True  # Signal để frontend đóng tab
+    })
