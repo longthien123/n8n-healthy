@@ -11,8 +11,6 @@ import {
   Box,
   Typography,
   Button,
-  IconButton,
-  Tooltip,
 } from "@mui/material";
 import "./PatientList.css";
 import { useNavigate } from "react-router-dom";
@@ -35,10 +33,12 @@ export default function PatientList() {
   }, []);
 
   const handleDelete = async (id) => {
-    const response = await deletePatient(id);
-    if (response) {
-      toast.success(response.message);
-      navigate("admin/patient");
+    if (window.confirm("Are you sure you want to delete this patient?")) {
+      const response = await deletePatient(id);
+      if (response) {
+        toast.success(response.message);
+        getPatients();
+      }
     }
   };
 
@@ -51,7 +51,7 @@ export default function PatientList() {
     <div className="Table">
       <div className="patient-container">
         <Typography variant="h4" className="title">
-          Patients List
+          Patients Management
         </Typography>
 
         <Box className="table-wrapper">
@@ -60,13 +60,13 @@ export default function PatientList() {
               <TableHead>
                 <TableRow className="table-header-row">
                   {[
-                    "Patient No",
-                    "Name",
+                    "Patient ID",
+                    "Full Name",
                     "Date of Birth",
                     "Gender",
                     "Address",
-                    "Blood",
-                    "Action",
+                    "Blood Type",
+                    "Actions",
                   ].map((header) => (
                     <TableCell key={header} className="table-header">
                       {header}
@@ -83,18 +83,29 @@ export default function PatientList() {
                     <TableCell>{patient.date_of_birth}</TableCell>
                     <TableCell>{patient.gender}</TableCell>
                     <TableCell>{patient.address}</TableCell>
-                    <TableCell>{patient.blood_type}</TableCell>
+                    <TableCell>
+                      <span
+                        style={{
+                          background:
+                            "linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%)",
+                          color: "white",
+                          padding: "4px 12px",
+                          borderRadius: "12px",
+                          fontSize: "12px",
+                          fontWeight: "600",
+                        }}
+                      >
+                        {patient.blood_type}
+                      </span>
+                    </TableCell>
 
                     <TableCell>
                       <div className="action-buttons">
-                        {/* EDIT BUTTON */}
                         <Button
                           variant="contained"
                           color="primary"
                           size="small"
-                          onClick={() =>
-                            navigate(`/admin/patient/${patient.id}`)
-                          }
+                          onClick={() => navigate(`/admin/patient/${patient.id}`)}
                         >
                           Edit
                         </Button>
@@ -102,9 +113,7 @@ export default function PatientList() {
                           variant="contained"
                           color="error"
                           size="small"
-                          onClick={() => {
-                            handleDelete(patient.id);
-                          }}
+                          onClick={() => handleDelete(patient.id)}
                         >
                           Remove
                         </Button>
@@ -136,7 +145,7 @@ export default function PatientList() {
           sx={{ mt: 3, float: "right" }}
           onClick={() => navigate("/info-patient")}
         >
-          Add Patient
+          ➕ Add New Patient
         </Button>
       </div>
     </div>

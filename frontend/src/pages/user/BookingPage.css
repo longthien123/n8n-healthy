@@ -1,0 +1,280 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+
+.booking-page-container {
+    min-height: 90vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+.booking-card {
+    max-width: 750px;
+    width: 100%;
+    border-radius: 25px;
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.booking-card-media {
+    height: 240px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.booking-card-media::before {
+    content: '';
+    position: absolute;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+    animation: pulse 4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1) translate(-50%, -50%);
+        opacity: 0.3;
+    }
+    50% {
+        transform: scale(1.1) translate(-45%, -45%);
+        opacity: 0.5;
+    }
+}
+
+.doctor-avatar-large {
+    width: 140px;
+    height: 140px;
+    border: 5px solid white;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    position: relative;
+    z-index: 1;
+}
+
+.booking-card-content {
+    padding: 35px 40px;
+}
+
+.doctor-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 32px;
+    font-weight: 700;
+    text-align: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 8px;
+}
+
+.doctor-subtitle {
+    font-family: 'Poppins', sans-serif;
+    text-align: center;
+    color: #888;
+    font-size: 16px;
+    margin-bottom: 25px;
+}
+
+.info-divider {
+    margin: 25px 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #667eea, transparent);
+    border: none;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.info-item {
+    font-family: 'Poppins', sans-serif;
+    font-size: 15px;
+    color: #555;
+}
+
+.info-item strong {
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+.schedule-grid {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(240, 147, 251, 0.05));
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    border: 1px solid rgba(102, 126, 234, 0.1);
+}
+
+.schedule-item {
+    font-family: 'Poppins', sans-serif;
+    font-size: 15px;
+    color: #667eea;
+    font-weight: 500;
+}
+
+.schedule-item strong {
+    color: #2c3e50;
+}
+
+.booking-section-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.booking-section-title::before {
+    content: '📅';
+    font-size: 28px;
+}
+
+.booking-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.datetime-picker-row {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.datetime-picker-row .ant-picker {
+    flex: 1;
+    min-width: 200px;
+    height: 45px;
+    border-radius: 12px;
+    border: 2px solid #e0e0e0;
+    font-family: 'Poppins', sans-serif;
+    transition: all 0.3s ease;
+}
+
+.datetime-picker-row .ant-picker:hover,
+.datetime-picker-row .ant-picker-focused {
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.booking-textfield {
+    font-family: 'Poppins', sans-serif;
+}
+
+.booking-textfield .MuiOutlinedInput-root {
+    border-radius: 12px;
+    font-family: 'Poppins', sans-serif;
+}
+
+.booking-textfield .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
+    border-color: #667eea;
+}
+
+.booking-textfield .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+    border-color: #667eea;
+}
+
+.booking-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 25px;
+    flex-wrap: wrap;
+}
+
+.btn-check-availability {
+    flex: 1;
+    min-width: 180px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 14px 28px;
+    border-radius: 25px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+    text-transform: none;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+}
+
+.btn-check-availability:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+}
+
+.btn-book-now {
+    flex: 1;
+    min-width: 180px;
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    color: white;
+    padding: 14px 28px;
+    border-radius: 25px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+    text-transform: none;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(17, 153, 142, 0.3);
+}
+
+.btn-book-now:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(17, 153, 142, 0.5);
+}
+
+.login-message {
+    font-family: 'Poppins', sans-serif;
+    color: #e74c3c;
+    text-align: center;
+    padding: 20px;
+    background: rgba(231, 76, 60, 0.1);
+    border-radius: 12px;
+    font-weight: 500;
+}
+
+@media screen and (max-width: 768px) {
+    .booking-card-content {
+        padding: 25px 20px;
+    }
+
+    .doctor-title {
+        font-size: 26px;
+    }
+
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .datetime-picker-row {
+        flex-direction: column;
+    }
+
+    .datetime-picker-row .ant-picker {
+        width: 100%;
+    }
+
+    .booking-actions {
+        flex-direction: column;
+    }
+
+    .btn-check-availability,
+    .btn-book-now {
+        width: 100%;
+    }
+}
