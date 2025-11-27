@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import * as FaIcons from "react-icons/fa";
 import * as AiIcons from "react-icons/ai";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import "./Navbar.css";
 import { IconContext } from "react-icons";
 import { useNavigate } from "react-router-dom";
@@ -10,6 +10,7 @@ import SidebarData from "./SidebarData";
 function Navbar() {
   const [sidebar, setSidebar] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const showSidebar = () => setSidebar(!sidebar);
 
@@ -24,7 +25,7 @@ function Navbar() {
           <button
             className="logout-btn"
             onClick={() => {
-              localStorage.clear();
+              sessionStorage.clear();
               navigate("/login");
             }}
           >
@@ -38,11 +39,15 @@ function Navbar() {
               <AiIcons.AiOutlineClose className="close-icon" onClick={showSidebar} />
             </li>
 
-            <h2 className="sidebar-title">ADMIN PANEL</h2>
+            <h2 className="sidebar-title">⚕️ ADMIN PANEL</h2>
 
             {SidebarData.map((item, index) => (
               <li key={index} className="nav-text">
-                <Link to={item.path}>
+                <Link 
+                  to={item.path}
+                  className={location.pathname === item.path ? 'active' : ''}
+                  onClick={showSidebar}
+                >
                   {item.icon}
                   <span>{item.title}</span>
                 </Link>

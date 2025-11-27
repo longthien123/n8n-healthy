@@ -12,9 +12,8 @@ import {
   Box,
   Typography,
   Button,
-  Stack
+  Stack,
 } from "@mui/material";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { deleteDoctor, getAllDoctor } from "../../services/DoctorServicce";
 import { toast } from "react-toastify";
@@ -38,111 +37,134 @@ export default function DoctorList() {
     fetchDoctors();
   }, []);
 
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
+  const handleDelete = async (id) => {
+    if (window.confirm("Are you sure you want to delete this doctor?")) {
+      const response = await deleteDoctor(id);
+      if (response) {
+        toast.success(response.message);
+        fetchDoctors();
+      }
+    }
   };
 
   const displayedDoctors = doctors.slice(
     page * rowsPerPage,
     page * rowsPerPage + rowsPerPage
   );
-  const handleDelete = async (id) => {
-    const response = await deleteDoctor(id);
-    if (response) {
-      toast.success(response.message)
-      navigate("admin/doctor")
-    }
-  }
+
   return (
-    <Box sx={{ padding: "20px 5%", minHeight: "100vh", background: "#f5f6fa" }}>
-      <Typography
-        variant="h4"
-        gutterBottom
-        sx={{ fontWeight: "bold", color: "#060b26", mb: 3, textAlign: "center" }}
-      >
-        Doctors List
-      </Typography>
+    <div className="Table">
+      <div className="patient-container">
+        <Typography variant="h4" className="title" sx={{
+          '&::before': {
+            content: '"👨‍⚕️"',
+            WebkitTextFillColor: 'initial'
+          }
+        }}>
+          Doctors Management
+        </Typography>
 
-      <TableContainer component={Paper} sx={{ borderRadius: "12px", overflow: "hidden", boxShadow: 3 }}>
-        <Table sx={{ minWidth: 650 }}>
-          <TableHead>
-            <TableRow sx={{ backgroundColor: "#060b26" }}>
-              {["Name", "Email", "Phone", "Experience", "License", "Specialization", "Actions"].map((header) => (
-                <TableCell
-                  key={header}
-                  sx={{ color: "white", fontWeight: "bold", textAlign: "center" }}
-                >
-                  {header}
-                </TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
+        <Box className="table-wrapper">
+          <TableContainer component={Paper} className="table-box">
+            <Table>
+              <TableHead>
+                <TableRow className="table-header-row">
+                  {[
+                    "Doctor Name",
+                    "Email",
+                    "Phone",
+                    "Experience",
+                    "License",
+                    "Specialization",
+                    "Actions",
+                  ].map((header) => (
+                    <TableCell key={header} className="table-header">
+                      {header}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              </TableHead>
 
-          <TableBody>
-            {displayedDoctors.map((doctor) => (
-              <TableRow
-                key={doctor.doctorNo}
-                sx={{
-                  "&:nth-of-type(even)": { backgroundColor: "#f9f9f9" },
-                  "&:hover": { backgroundColor: "#e3f2fd" },
-                }}
-              >
-                <TableCell>{doctor.user.full_name}</TableCell>
-                <TableCell>{doctor.user.email}</TableCell>
-                <TableCell>{doctor.user.phone}</TableCell>
-                <TableCell>{doctor.experience_years}</TableCell>
-                <TableCell>{doctor.license_number}</TableCell>
-                <TableCell>{doctor.specialization}</TableCell>
-                <TableCell>
-                  <Stack direction="row" spacing={1} justifyContent="center">
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      size="small"
-                      onClick={() => navigate(`/admin/doctor/${doctor.id}`)}
-                    >
-                      Edit
-                    </Button>
-                    <Button
-                      variant="contained"
-                      color="error"
-                      size="small"
-                      onClick={() => {handleDelete(doctor.id)}}
-                    >
-                      Remove
-                    </Button>
-                  </Stack>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+              <TableBody>
+                {displayedDoctors.map((doctor) => (
+                  <TableRow key={doctor.id} className="table-row">
+                    <TableCell>{doctor.user.full_name}</TableCell>
+                    <TableCell>{doctor.user.email}</TableCell>
+                    <TableCell>{doctor.user.phone}</TableCell>
+                    <TableCell>
+                      <span style={{
+                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                        color: 'white',
+                        padding: '4px 12px',
+                        borderRadius: '12px',
+                        fontSize: '12px',
+                        fontWeight: '600'
+                      }}>
+                        {doctor.experience_years} years
+                      </span>
+                    </TableCell>
+                    <TableCell>{doctor.license_number}</TableCell>
+                    <TableCell>
+                      <span style={{
+                        background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+                        color: 'white',
+                        padding: '4px 12px',
+                        borderRadius: '12px',
+                        fontSize: '12px',
+                        fontWeight: '600'
+                      }}>
+                        {doctor.specialization}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <Stack direction="row" spacing={1} justifyContent="center" className="action-buttons">
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          size="small"
+                          onClick={() => navigate(`/admin/doctor/${doctor.id}`)}
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          variant="contained"
+                          color="error"
+                          size="small"
+                          onClick={() => handleDelete(doctor.id)}
+                        >
+                          Remove
+                        </Button>
+                      </Stack>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Box>
 
-      <TablePagination
-        rowsPerPageOptions={[5, 10, 25]}
-        component="div"
-        count={doctors.length}
-        rowsPerPage={rowsPerPage}
-        page={page}
-        onPageChange={handleChangePage}
-        onRowsPerPageChange={handleChangeRowsPerPage}
-        sx={{ mt: 2 }}
-      />
+        <TablePagination
+          rowsPerPageOptions={[5, 10, 25]}
+          component="div"
+          count={doctors.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={(e, p) => setPage(p)}
+          onRowsPerPageChange={(e) => {
+            setRowsPerPage(parseInt(e.target.value, 10));
+            setPage(0);
+          }}
+        />
 
-      <Button
-        variant="contained"
-        color="success"
-        sx={{ mt: 3, float: "right" }}
-        onClick={() => navigate("/admin/add-doctor")}
-      >
-        Add Doctor
-      </Button>
-    </Box>
+        <Button
+          variant="contained"
+          color="success"
+          sx={{ mt: 3, float: "right" }}
+          onClick={() => navigate("/admin/add-doctor")}
+        >
+          ➕ Add New Doctor
+        </Button>
+      </div>
+    </div>
   );
 }

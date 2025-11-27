@@ -10,21 +10,21 @@ import {
   Button,
   Typography,
   Box,
-  Grid,
-  Divider,
   TextField,
+  Avatar,
 } from "@mui/material";
 import user from "../../assests/user.png";
-import {  getDoctorById, getScheduleOfDoctor } from "../../services/DoctorServicce";
+import { getDoctorById, getScheduleOfDoctor } from "../../services/DoctorServicce";
 import { toast } from "react-toastify";
 import { getPatientIdByUserId, postN8nScheduleOfPatient, postScheduleOfPatient } from "../../services/PatientService";
+import "./BookingPage.css";
 
 const BookingPage = () => {
   const params = useParams();
   const isloggedIn = sessionStorage.getItem("access_token");
-const userData = sessionStorage.getItem("user");
-const user = userData ? JSON.parse(userData) : null;
-const userId = user?.id;
+  const userData = sessionStorage.getItem("user");
+  const userObj = userData ? JSON.parse(userData) : null;
+  const userId = userObj?.id;
 
   const [doctor, setDoctor] = useState(null);
   const [doctorSchedule, setDoctorSchedule] = useState([]);
@@ -33,13 +33,12 @@ const userId = user?.id;
   const [reason, setReason] = useState("");
   const [notes, setNotes] = useState("");
   const [isAvailable, setIsAvailable] = useState(false);
-  const [id, setId] = useState(null)
+  const [id, setId] = useState(null);
+
   const disabledHours = () => {
-  const hours = Array.from({ length: 24 }, (_, i) => i);
-
-  const allowedHours = [8, 9, 10, 11, 14, 15, 16, 17];
-
-  return hours.filter(hour => !allowedHours.includes(hour));
+    const hours = Array.from({ length: 24 }, (_, i) => i);
+    const allowedHours = [8, 9, 10, 11, 14, 15, 16, 17];
+    return hours.filter((hour) => !allowedHours.includes(hour));
   };
 
   const fetchDoctor = async () => {
@@ -49,13 +48,13 @@ const userId = user?.id;
 
   const fetchScheduleDoctor = async () => {
     const res = await getScheduleOfDoctor(params.id);
-    if (res)   setDoctorSchedule(res?.schedules ?? []);
+    if (res) setDoctorSchedule(res?.schedules ?? []);
   };
 
   const fetchPatient = async () => {
     const res = await getPatientIdByUserId(userId);
-    if (res) setId(res.data.id)
-  }
+    if (res) setId(res.data.id);
+  };
 
   useEffect(() => {
     fetchDoctor();
@@ -63,162 +62,127 @@ const userId = user?.id;
     fetchPatient();
   }, []);
 
-  // Chuyển date + time sang format API
-  const appointment_date_convert = date ? moment(date, "DD-MM-YYYY").format("YYYY-MM-DD") : null;
+  const appointment_date_convert = date
+    ? moment(date, "DD-MM-YYYY").format("YYYY-MM-DD")
+    : null;
   const time_slot_convert = time
     ? `${time}-${moment(time, "HH:mm").add(1, "hour").format("HH:mm")}`
     : null;
 
   const handleAvailability = () => {
-    
-const isValidDate = doctorSchedule.some(
-  (sch) => sch.work_date === appointment_date_convert
-);
+    const isValidDate = doctorSchedule.some(
+      (sch) => sch.work_date === appointment_date_convert
+    );
 
-if (!isValidDate) {
-  return toast.error("Vui lòng chọn đúng ngày làm việc");
-}
+    if (!isValidDate) {
+      return toast.error("Vui lòng chọn đúng ngày làm việc");
+    }
 
     if (!date || !time) {
       return message.error("Please select date and time.");
     }
-    
+
     setIsAvailable(true);
     message.success("Slot Available!");
   };
 
-  const handleBooking = async() => {
-     const data = {
+  const handleBooking = async () => {
+    const data = {
       patient: id,
       doctor: params.id,
       appointment_date: appointment_date_convert,
       time_slot: time_slot_convert,
       reason: reason,
-      notes: notes
-    }
-        console.log(data);
+      notes: notes,
+    };
+
     try {
-    const res = await postScheduleOfPatient(data);
-    console.log(res);
+      const res = await postScheduleOfPatient(data);
 
-    if (res?.success === true) {
-      await postN8nScheduleOfPatient(data)
-      toast.success(res.message);
-    } else {
-      toast.error(res?.data?.message || "Lỗi không xác định");
+      if (res?.success === true) {
+        await postN8nScheduleOfPatient(data);
+        toast.success(res.message);
+      } else {
+        toast.error(res?.data?.message || "Lỗi không xác định");
+      }
+    } catch (error) {
+      const msg =
+        error.response?.data?.errors?.non_field_errors?.[0] ||
+        error.response?.data?.message ||
+        "Đã xảy ra lỗi";
+      toast.error(msg);
     }
-
-  } catch (error) {
-    // lấy lỗi backend trả về
-    const msg = error.response?.data?.errors?.non_field_errors?.[0]
-             || error.response?.data?.message
-             || "Đã xảy ra lỗi";
-
-    toast.error(msg);
-  }
-    
   };
 
   if (!doctor) {
-    return <h2 style={{ textAlign: "center", marginTop: 50 }}>Loading...</h2>;
+    return (
+      <Box className="booking-page-container">
+        <Typography variant="h5" sx={{ fontFamily: 'Poppins', color: '#667eea' }}>
+          Loading...
+        </Typography>
+      </Box>
+    );
   }
 
   return (
-    <Box
-      sx={{
-        minHeight: "90vh",
-        display: "flex",
-        justifyContent: "center",
-        paddingTop: "5vh",
-      }}
-    >
-      <Card
-        sx={{
-          maxWidth: 700,
-          width: "100%",
-          borderRadius: "18px",
-          boxShadow: "0 6px 20px rgba(0,0,0,0.15)",
-          paddingBottom: 3,
-        }}
-      >
-        <CardMedia
-          sx={{
-            height: 220,
-            backgroundSize: "contain",
-            backgroundColor: "#f5f8ff",
-          }}
-          image={user}
-        />
+    <Box className="booking-page-container">
+      <Card className="booking-card">
+        <CardMedia className="booking-card-media">
+          <Avatar src={user} className="doctor-avatar-large" />
+        </CardMedia>
 
-        <CardContent>
-          <Typography
-            variant="h4"
-            sx={{ textAlign: "center", fontWeight: "bold", color: "#002D62" }}
-          >
-            {doctor.fullname}
-          </Typography>
+        <CardContent className="booking-card-content">
+          <Typography className="doctor-title">{doctor.fullname}</Typography>
+          <Typography className="doctor-subtitle">Medical Professional</Typography>
 
-          <Typography
-            variant="subtitle1"
-            sx={{ textAlign: "center", color: "#555", mb: 2 }}
-          >
-            Doctor Profile
-          </Typography>
+          <hr className="info-divider" />
 
-          <Divider sx={{ mb: 3 }} />
+          <div className="info-grid">
+            <Typography className="info-item">
+              <strong>Doctor ID:</strong> BS{doctor.id}
+            </Typography>
+            <Typography className="info-item">
+              <strong>Phone:</strong> {doctor.user?.phone || "N/A"}
+            </Typography>
+            <Typography className="info-item">
+              <strong>Specialization:</strong> {doctor.specialization}
+            </Typography>
+            <Typography className="info-item">
+              <strong>Experience:</strong> {doctor.experience_years} years
+            </Typography>
+          </div>
 
-          {/* Doctor Info */}
-          <Grid container spacing={2}>
-            <Grid item xs={6}>
-              <Typography><strong>Doctor No:</strong> BS{doctor.id}</Typography>
-            </Grid>
-            <Grid item xs={6}>
-              <Typography><strong>Phone:</strong> {doctor.user?.phone || ""}</Typography>
-            </Grid>
-            <Grid item xs={6}>
-              <Typography><strong>Specialization:</strong> {doctor.specialization}</Typography>
-            </Grid>
-            <Grid item xs={6}>
-              <Typography><strong>Experience:</strong> {doctor.experience_years} years</Typography>
-            </Grid>
-            {doctorSchedule.map((schedule) => (
-  <Grid container spacing={2} key={schedule.id} sx={{ mb: 1 }}>
-    <Grid item xs={6}>
-      <Typography style={{color: "red"}}>
-        <strong style={{color: "black"}}>Work Date:</strong> {schedule.work_date}
-      </Typography>
-    </Grid>
-    <Grid item xs={6}>
-      <Typography style={{color: "red"}}>
-        <strong style={{color: "black"}}>Shift:</strong> {schedule.start_time} → {schedule.end_time}
-      </Typography>
-    </Grid>
-  </Grid>
-))}
+          {doctorSchedule.map((schedule) => (
+            <div key={schedule.id} className="schedule-grid">
+              <Typography className="schedule-item">
+                <strong>📅 Work Date:</strong> {schedule.work_date}
+              </Typography>
+              <Typography className="schedule-item">
+                <strong>⏰ Shift:</strong> {schedule.start_time} → {schedule.end_time}
+              </Typography>
+            </div>
+          ))}
 
-          </Grid>
+          <hr className="info-divider" />
 
-          <Divider sx={{ my: 3 }} />
-
-          {/* Booking Form */}
-          <Typography variant="h6" sx={{ color: "#002D62", mb: 1 }}>
-            Book Appointment
-          </Typography>
+          <Typography className="booking-section-title">Book Your Appointment</Typography>
 
           {isloggedIn ? (
-            <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-              <Box sx={{ display: "flex", gap: 2 }}>
+            <Box className="booking-form">
+              <div className="datetime-picker-row">
                 <DatePicker
                   format="DD-MM-YYYY"
                   onChange={(date) => setDate(date ? date.format("DD-MM-YYYY") : null)}
+                  placeholder="Select Date"
                 />
                 <TimePicker
                   format="HH:mm"
                   onChange={(time) => setTime(time ? time.format("HH:mm") : null)}
                   disabledHours={disabledHours}
                   minuteStep={60}
+                  placeholder="Select Time"
                 />
-              </Box>
+              </div>
 
               <TextField
                 label="Reason for Appointment"
@@ -226,7 +190,9 @@ if (!isValidDate) {
                 fullWidth
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
+                className="booking-textfield"
               />
+
               <TextField
                 label="Notes (Optional)"
                 variant="outlined"
@@ -235,34 +201,24 @@ if (!isValidDate) {
                 rows={3}
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
+                className="booking-textfield"
               />
 
-              <CardActions sx={{ mt: 1 }}>
-                <Button
-                  variant="contained"
-                  sx={{
-                    backgroundColor: "#005A9C",
-                    "&:hover": { backgroundColor: "#003f6f" },
-                  }}
-                  onClick={handleAvailability}
-                >
+              <div className="booking-actions">
+                <button className="btn-check-availability" onClick={handleAvailability}>
                   Check Availability
-                </Button>
+                </button>
 
                 {isAvailable && (
-                  <Button
-                    variant="contained"
-                    color="success"
-                    onClick={handleBooking}
-                  >
+                  <button className="btn-book-now" onClick={handleBooking}>
                     Book Now
-                  </Button>
+                  </button>
                 )}
-              </CardActions>
+              </div>
             </Box>
           ) : (
-            <Typography sx={{ mt: 2, color: "red" }}>
-              Please login to book an appointment.
+            <Typography className="login-message">
+              ⚠️ Please login to book an appointment
             </Typography>
           )}
         </CardContent>

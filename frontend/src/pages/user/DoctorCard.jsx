@@ -1,17 +1,10 @@
 import React, { useEffect, useState } from "react";
-import {
-  Grid,
-  Card,
-  CardContent,
-  Typography,
-  Button,
-  Avatar,
-  Box,
-} from "@mui/material";
+import { Grid, Card, CardContent, Typography, Button, Avatar, Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import maleAvatar from "../../assests/male-avatar.jpg";
 import femaleAvatar from "../../assests/female-avatar.jpg";
 import { getAllDoctor } from "../../services/DoctorServicce";
+import "./DoctorCard.css";
 
 const DoctorGrid = () => {
   const navigate = useNavigate();
@@ -19,8 +12,6 @@ const DoctorGrid = () => {
 
   const fetchDoctor = async () => {
     const res = await getAllDoctor();
-    console.log(res);
-    
     if (res) {
       setDoctorData(res.data);
     }
@@ -30,77 +21,46 @@ const DoctorGrid = () => {
     fetchDoctor();
   }, []);
 
-  const getAvatarSrc = (gender) => (gender === "MALE" ? maleAvatar : maleAvatar);
+  const getAvatarSrc = (gender) => (gender === "MALE" ? maleAvatar : femaleAvatar);
 
   return (
-    <Box sx={{ padding: "30px" }}>
-      <Typography
-        variant="h4"
-        sx={{ fontWeight: "bold", color: "#002D62", mb: 3, textAlign: "center" }}
-      >
-        Doctors Directory
+    <Box className="doctor-grid-container">
+      <Typography className="doctor-grid-title">
+        👨‍⚕️ Our Medical Team
       </Typography>
 
-      <Grid container spacing={3}>
+      <Grid container spacing={4}>
         {doctorData.map((doctor) => (
-          <Grid item xs={12} sm={6} md={4} lg={3} key={doctor.doctorNo}>
-            <Card
-              sx={{
-                borderRadius: "15px",
-                boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                padding: "20px",
-                textAlign: "center",
-                transition: "0.3s",
-                "&:hover": {
-                  transform: "translateY(-7px)",
-                  boxShadow: "0 8px 20px rgba(0,0,0,0.2)",
-                },
-              }}
-            >
+          <Grid item xs={12} sm={6} md={4} lg={3} key={doctor.id}>
+            <Card className="doctor-card" elevation={0}>
               <Avatar
                 src={getAvatarSrc(doctor.Gender)}
-                alt="Doctor Avatar"
-                sx={{
-                  width: 90,
-                  height: 90,
-                  margin: "0 auto",
-                  border: "3px solid #002D62",
-                  mb: 2,
-                }}
+                alt={doctor.user.full_name}
+                className="doctor-avatar"
               />
 
-              <CardContent>
-                <Typography variant="h6" sx={{ fontWeight: "bold", color: "#002D62" }}>
+              <CardContent sx={{ padding: 0, flex: 1, display: 'flex', flexDirection: 'column' }}>
+                <Typography className="doctor-name">
                   {doctor.user.full_name}
                 </Typography>
 
-                <Typography variant="body2" sx={{ mt: 1, color: "#444" }}>
+                <Typography className="doctor-info">
                   📞 {doctor.user.phone}
                 </Typography>
 
-                <Typography
-                  variant="body2"
-                  sx={{ mt: 1, color: "#1F75FE", fontWeight: "bold" }}
-                >
+                <Typography className="doctor-specialization">
                   🩺 {doctor.specialization}
                 </Typography>
 
+                <Typography className="doctor-experience">
+                  💼 {doctor.experience_years} years experience
+                </Typography>
+
                 <Button
-                  variant="contained"
-                  sx={{
-                    mt: 2,
-                    backgroundColor: "#04619f",
-                    padding: "6px 20px",
-                    borderRadius: "10px",
-                    textTransform: "none",
-                    fontWeight: "bold",
-                    "&:hover": { backgroundColor: "#002D62" },
-                  }}
-                  onClick={() =>
-                    navigate(`/doctors/book-appointment/${doctor.id}`)
-                  }
+                  className="doctor-view-btn"
+                  onClick={() => navigate(`/doctors/book-appointment/${doctor.id}`)}
                 >
-                  View Details
+                  📅 Book Appointment
                 </Button>
               </CardContent>
             </Card>

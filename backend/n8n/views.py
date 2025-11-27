@@ -119,3 +119,49 @@ def trigger_reminders_view(request):
             'message': f"Lệnh bị lỗi: {str(e)}",
             'log_output': error_output 
         }, status=500)
+    
+
+    #Nhắc lịch trên n8n(gọi send_reminder)
+def doctors_reminders_view(request):
+    
+    # 1. Kiểm tra tham số 'mode' từ URL (ví dụ: /api/cron-check/?mode=test)
+    mode = request.GET.get('mode', 'production') # Mặc định là 'production'
+    
+    # Chuẩn bị tham số cho call_command
+    args = []
+    options = {}
+    
+    if mode == 'test':
+        # Nếu mode là 'test', thêm cờ --test vào options
+        options['test'] = True
+    
+    # Tạo bộ đệm để bắt log output
+    output_buffer = io.StringIO()
+    
+    try:
+        # 2. Gọi lệnh management command
+        # options={'test': True} sẽ tương đương với --test trên command line
+        call_command('send_doctors', *args, **options, stdout=output_buffer) 
+        
+        command_output = output_buffer.getvalue()
+        
+        # 3. Trả về kết quả cho n8n
+        return JsonResponse({
+            'status': 'success', 
+            'mode_ran': mode,
+            'log_output': command_output 
+        })
+    
+    except Exception as e:
+        error_output = output_buffer.getvalue()
+        
+        return JsonResponse({
+            'status': 'error', 
+            'mode_ran': mode,
+            'message': f"Lệnh bị lỗi: {str(e)}",
+            'log_output': error_output 
+        }, status=500)
+    
+
+
+
