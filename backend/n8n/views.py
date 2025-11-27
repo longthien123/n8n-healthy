@@ -62,9 +62,9 @@ def send_booking_to_n8n(request):
     # Gọi webhook n8n
     try:
         response = requests.post(
-            "https://son-ardeid-dobsonfly.ngrok-free.dev/webhook-test/421354db-d81c-4145-aa7d-d24f7a601000",  # Thay bằng URL của bạn
+            "https://longthien.duckdns.org/webhook/01c9b0a9-08ae-44d9-b553-d716a6632aa4",  # Thay bằng URL của bạn
             json=payload,
-            timeout=5
+            timeout=10
         )
         response.raise_for_status()  # Raise lỗi nếu n8n trả về lỗi
 

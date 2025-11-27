@@ -28,7 +28,7 @@ const getPatientIdByUserId = (id) => {
 }
 //đặt lịch
 const postScheduleOfPatient = (data) => {
-    return axios.post(`/appointments/appointments/create/`, {
+    return axios.post(`appointments/appointments/create/`, {
         patient: data.patient,
       doctor: data.doctor,
       appointment_date: data.appointment_date,
