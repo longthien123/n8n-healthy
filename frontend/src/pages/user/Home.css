@@ -5,6 +5,23 @@
     display: flex;
     flex-direction: column;
 }
+.messenger-float {
+  position: fixed;
+  right: 20px;
+  bottom: 90px;  /* cao hơn footer */
+  z-index: 9999;
+}
+
+/* Hiệu ứng hover */
+.messenger-float button {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.messenger-float button:hover {
+  transform: scale(1.08);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+}
+
 
 /* Animation cho container */
 @keyframes fadeIn {

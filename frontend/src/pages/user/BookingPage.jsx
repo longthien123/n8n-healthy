@@ -42,7 +42,7 @@ const BookingPage = () => {
   };
 
   const fetchDoctor = async () => {
-    const res = await getDoctorById(params.id);
+    const res = await getDoctorById(params.id);    
     if (res) setDoctor(res.data);
   };
 
@@ -132,7 +132,7 @@ const BookingPage = () => {
         </CardMedia>
 
         <CardContent className="booking-card-content">
-          <Typography className="doctor-title">{doctor.fullname}</Typography>
+          <Typography className="doctor-title">{doctor.user.full_name}</Typography>
           <Typography className="doctor-subtitle">Medical Professional</Typography>
 
           <hr className="info-divider" />
