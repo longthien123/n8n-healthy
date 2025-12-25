@@ -25,4 +25,9 @@ urlpatterns = [
     path('appointments/<int:appointment_id>/cancel-by-id/', views.cancel_appointment_by_id, name='cancel_appointment_by_id'),
     # Special appointment endpoints
     path('appointments/available-slots/', views.get_available_time_slots, name='get_available_time_slots'),
+    
+    # Doctor Dashboard endpoints (THÊM MỚI)
+    path('appointments/doctor/<int:doctor_id>/', views.get_doctor_appointments, name='get_doctor_appointments'),
+    path('appointments/<int:pk>/detail/', views.get_appointment_detail, name='get_appointment_detail'),
+    path('appointments/<int:pk>/complete/', views.complete_appointment, name='complete_appointment'),
 ]

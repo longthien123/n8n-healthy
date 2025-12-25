@@ -17,6 +17,9 @@ import PatientRegister from "./pages/auth/patientRegister";
 import EditPatient from "./pages/admin/EditPatient";
 import CancelAppointment from "./components/CancelAppointment"; // THÊM IMPORT
 import ActivationResult from "./components/ActivationResult"; // THÊM IMPORT
+// THÊM MỚI: Import trang Doctor Dashboard
+import DoctorDashboard from "./pages/doctor/DoctorDashboard";
+import AppointmentDetail from "./pages/doctor/AppointmentDetail";
 
 const  Layout = () => {
     
@@ -58,6 +61,11 @@ const  Layout = () => {
                 
                 
             </Route>
+            
+            {/* THÊM MỚI: Doctor Dashboard Routes */}
+            <Route path="/doctor" element={<DoctorDashboard />} />
+            <Route path="/doctor/appointment/:id" element={<AppointmentDetail />} />
+            
             {/* <Route path="*" element={<NotFound />}></Route>  */}
         </Routes>
         <ToastContainer
