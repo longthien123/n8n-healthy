@@ -32,6 +32,11 @@ npm install
 npm run dev
 ```
 
+Add API in FrontEnd 
+- Folder services
+- Add API in appropriate file
+- Example file API: ![alt text](./image.png)
+
 The frontend will call the backend API at `http://localhost:8000/api/health/`.
 
 Project files (important)

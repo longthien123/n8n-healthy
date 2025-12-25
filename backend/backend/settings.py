@@ -1,6 +1,9 @@
 from pathlib import Path
 import os
 
+USE_TZ = True
+TIME_ZONE = 'Asia/Ho_Chi_Minh'
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get('DJANGO_SECRET', 'dev-secret')
@@ -18,7 +21,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'corsheaders',
-    'api',
+    'users',
+    'appointments',
+    'n8n',
 ]
 
 MIDDLEWARE = [
@@ -54,16 +59,24 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': os.environ.get('MYSQL_DB_NAME', 'railway'),   # Tên DB trên Railway
+        'USER': os.environ.get('MYSQL_USER', 'root'),         # User trên Railway
+        'PASSWORD': os.environ.get('MYSQL_PASSWORD', 'xWoJZALVIFfDBTJRqZnxnnQLXIursKSI'),     # Password trên Railway
+        'HOST': os.environ.get('MYSQL_HOST', 'yamanote.proxy.rlwy.net'),    # Host trên Railway (thường là ...containers.railway.app)
+        'PORT': os.environ.get('MYSQL_PORT', '41722'),         # Port (chú ý: Railway thường đổi port khác 3306)
+        'OPTIONS': {
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+        },
     }
 }
+
+AUTH_USER_MODEL = 'users.User'
 
 AUTH_PASSWORD_VALIDATORS = []
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
@@ -74,3 +87,21 @@ STATIC_URL = '/static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CORS_ALLOW_ALL_ORIGINS = True
+
+# Session settings
+SESSION_COOKIE_AGE = 3600 * 24 * 7  # 7 days
+SESSION_SAVE_EVERY_REQUEST = True
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+
+# CORS settings for session
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://localhost:3001",
+]
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+}
+

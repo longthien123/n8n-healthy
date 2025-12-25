@@ -1,0 +1,214 @@
+/* Doctor Dashboard Styles - Đồng bộ màu với Login (#4caaaf) */
+
+.doctor-dashboard {
+  min-height: 100vh;
+  background: linear-gradient(to right bottom, #d8f3f4, #ffffff);
+  padding: 30px;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.dashboard-title {
+  font-size: 32px;
+  font-weight: bold;
+  color: #0f7378;
+  margin-bottom: 5px;
+}
+
+.dashboard-subtitle {
+  color: #6c6c6c;
+  font-size: 16px;
+}
+
+.btn-logout {
+  padding: 10px 24px;
+  background-color: #ff6b6b;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-logout:hover {
+  background-color: #ee5a52;
+  transform: translateY(-2px);
+}
+
+/* Filter Tabs */
+.filter-tabs {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 25px;
+  flex-wrap: wrap;
+}
+
+.filter-tab {
+  padding: 10px 20px;
+  background-color: white;
+  border: 2px solid #b6e1e3;
+  border-radius: 8px;
+  font-weight: 600;
+  color: #0f7378;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.filter-tab:hover {
+  border-color: #4caaaf;
+  background-color: #e7f9fa;
+}
+
+.filter-tab.active {
+  background-color: #4caaaf;
+  color: white;
+  border-color: #4caaaf;
+}
+
+/* Appointments Grid */
+.appointments-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 20px;
+}
+
+.appointment-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.appointment-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0px 8px 25px rgba(0, 0, 0, 0.12);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #e7f9fa;
+}
+
+.patient-name {
+  font-size: 20px;
+  font-weight: bold;
+  color: #0f7378;
+  margin: 0;
+}
+
+/* Status Badges */
+.status-badge {
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.status-scheduled {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.status-confirmed {
+  background-color: #d1ecf1;
+  color: #0c5460;
+}
+
+.status-completed {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.status-cancelled {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.status-no-show {
+  background-color: #e2e3e5;
+  color: #383d41;
+}
+
+/* Card Body */
+.card-body {
+  margin-bottom: 15px;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+
+.info-row.reason {
+  flex-direction: column;
+  gap: 5px;
+}
+
+.info-row .label {
+  font-weight: 600;
+  color: #555;
+}
+
+.info-row .value {
+  color: #333;
+}
+
+/* Card Footer */
+.card-footer {
+  text-align: right;
+}
+
+.btn-view-detail {
+  padding: 8px 18px;
+  background-color: #4caaaf;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-view-detail:hover {
+  background-color: #3a8f94;
+}
+
+/* Loading & No Data */
+.loading,
+.no-data {
+  text-align: center;
+  padding: 50px;
+  font-size: 18px;
+  color: #6c6c6c;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .doctor-dashboard {
+    padding: 15px;
+  }
+
+  .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .appointments-grid {
+    grid-template-columns: 1fr;
+  }
+}

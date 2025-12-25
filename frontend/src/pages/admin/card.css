@@ -1,0 +1,345 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+
+.card-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 30px;
+  padding: 20px 0;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.card {
+  position: relative;
+  width: 100%;
+  height: 280px;
+  perspective: 1000px;
+  cursor: pointer;
+}
+
+.card__side {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  padding: 35px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-radius: 25px;
+  backface-visibility: hidden;
+  transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+
+.card__side::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+  animation: pulse 4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.3;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.5;
+  }
+}
+
+.card__side--front {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  z-index: 2;
+}
+
+.card__side--front::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, transparent, #f093fb, transparent);
+}
+
+.card__side--back {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: white;
+  transform: rotateY(180deg);
+}
+
+.card:hover .card__side--front {
+  transform: rotateY(-180deg);
+  box-shadow: 0 20px 50px rgba(102, 126, 234, 0.4);
+}
+
+.card:hover .card__side--back {
+  transform: rotateY(0);
+  box-shadow: 0 20px 50px rgba(240, 147, 251, 0.4);
+}
+
+/* Front Side */
+.card__theme {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+}
+
+.card__icon {
+  font-size: 80px;
+  margin-bottom: 25px;
+  animation: float 3s ease-in-out infinite;
+  filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.3));
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-15px);
+  }
+}
+
+.card__title {
+  font-size: 32px;
+  font-weight: 700;
+  margin: 0;
+  font-family: "Poppins", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  text-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+}
+
+.card__subtitle {
+  font-size: 14px;
+  font-weight: 400;
+  margin-top: 10px;
+  opacity: 0.9;
+  font-family: "Poppins", sans-serif;
+  letter-spacing: 1px;
+}
+
+/* Back Side */
+.card__cover {
+  margin-bottom: 20px;
+}
+
+.card__heading {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  font-family: "Poppins", sans-serif;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.card__heading-span {
+  background: rgba(255, 255, 255, 0.25);
+  padding: 10px 20px;
+  border-radius: 25px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.card__count {
+  font-size: 90px;
+  font-weight: 700;
+  margin: 0;
+  font-family: "Poppins", sans-serif;
+  text-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  animation: countUp 1s ease-out;
+}
+
+@keyframes countUp {
+  from {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.card__details {
+  margin-top: 20px;
+}
+
+.card__details ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.card__details li {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 10px 0;
+}
+
+.card__stat {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+  font-weight: 500;
+  font-family: "Poppins", sans-serif;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 8px 16px;
+  border-radius: 15px;
+  backdrop-filter: blur(5px);
+}
+
+.card__stat-icon {
+  font-size: 20px;
+}
+
+/* Hover effect decorations */
+.card__side--front .card__decoration {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  z-index: 0;
+}
+
+.card__decoration-1 {
+  top: -30px;
+  left: -30px;
+}
+
+.card__decoration-2 {
+  bottom: -30px;
+  right: -30px;
+}
+
+/* Action Buttons */
+.action-buttons .MuiButton-root {
+  font-family: 'Poppins', sans-serif !important;
+  font-weight: 600 !important;
+  font-size: 13px !important;
+  text-transform: none !important;
+  border-radius: 20px !important;
+  padding: 8px 20px !important;
+  transition: all 0.3s ease !important;
+  color: white !important; /* Đảm bảo chữ màu trắng */
+}
+
+.action-buttons .MuiButton-containedPrimary {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%) !important;
+  box-shadow: 0 4px 12px rgba(79, 172, 254, 0.3) !important;
+  color: white !important;
+}
+
+.action-buttons .MuiButton-containedPrimary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(79, 172, 254, 0.5) !important;
+  color: white !important;
+}
+
+.action-buttons .MuiButton-containedError {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important;
+  box-shadow: 0 4px 12px rgba(245, 87, 108, 0.3) !important;
+  color: white !important;
+}
+
+.action-buttons .MuiButton-containedError:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(245, 87, 108, 0.5) !important;
+  color: white !important;
+}
+
+/* Add Button */
+.MuiButton-containedSuccess {
+  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%) !important;
+  color: white !important;
+  font-family: 'Poppins', sans-serif !important;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+  text-transform: none !important;
+  border-radius: 25px !important;
+  padding: 12px 28px !important;
+  box-shadow: 0 5px 15px rgba(17, 153, 142, 0.3) !important;
+  transition: all 0.3s ease !important;
+}
+
+.MuiButton-containedSuccess:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(17, 153, 142, 0.5) !important;
+  color: white !important;
+}
+
+/* Responsive */
+@media screen and (max-width: 768px) {
+  .card-container {
+    grid-template-columns: 1fr;
+    gap: 25px;
+  }
+
+  .card {
+    height: 240px;
+  }
+
+  .card__side {
+    padding: 25px;
+  }
+
+  .card__icon {
+    font-size: 60px;
+    margin-bottom: 20px;
+  }
+
+  .card__title {
+    font-size: 26px;
+    letter-spacing: 2px;
+  }
+
+  .card__subtitle {
+    font-size: 12px;
+  }
+
+  .card__count {
+    font-size: 70px;
+  }
+
+  .card__heading {
+    font-size: 16px;
+  }
+
+  .card__stat {
+    font-size: 14px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .card {
+    height: 220px;
+  }
+
+  .card__icon {
+    font-size: 50px;
+  }
+
+  .card__title {
+    font-size: 22px;
+  }
+
+  .card__count {
+    font-size: 60px;
+  }
+}
