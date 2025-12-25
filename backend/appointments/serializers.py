@@ -233,3 +233,48 @@ class AppointmentReminderSerializer(serializers.ModelSerializer):
         if self.instance.status in [Appointment.Status.COMPLETED, Appointment.Status.CANCELLED]:
             raise serializers.ValidationError("Không thể bật nhắc nhở cho lịch khám đã hoàn thành hoặc đã hủy")
         return attrs
+
+
+# ===== DOCTOR DASHBOARD SERIALIZERS (THÊM MỚI) =====
+class PatientDetailSerializer(serializers.ModelSerializer):
+    """Serializer trả về đầy đủ thông tin patient (dùng cho Doctor Dashboard)"""
+    full_name = serializers.CharField(source='user.full_name', read_only=True)
+    email = serializers.CharField(source='user.email', read_only=True)
+    phone = serializers.CharField(source='user.phone', read_only=True)
+    
+    class Meta:
+        model = Patient
+        fields = ['id', 'patient_code', 'full_name', 'email', 'phone',
+                  'date_of_birth', 'gender', 'blood_type', 'address', 
+                  'allergies', 'emergency_contact']
+
+
+class DoctorDetailSerializer(serializers.ModelSerializer):
+    """Serializer trả về đầy đủ thông tin doctor (dùng cho Doctor Dashboard)"""
+    full_name = serializers.CharField(source='user.full_name', read_only=True)
+    email = serializers.CharField(source='user.email', read_only=True)
+    phone = serializers.CharField(source='user.phone', read_only=True)
+    
+    class Meta:
+        model = Doctor
+        fields = ['id', 'full_name', 'email', 'phone', 'specialization', 
+                  'license_number', 'experience_years']
+
+
+class AppointmentDetailSerializer(serializers.ModelSerializer):
+    """
+    Serializer cho Doctor Dashboard - trả về đầy đủ thông tin patient và doctor
+    Thay vì chỉ trả về patient_name, patient_code
+    """
+    patient = PatientDetailSerializer(read_only=True)
+    doctor = DoctorDetailSerializer(read_only=True)
+    
+    class Meta:
+        model = Appointment
+        fields = [
+            'id', 'patient', 'doctor',
+            'appointment_date', 'time_slot', 'status', 
+            'reason', 'notes', 'reminder_enabled',
+            'created_at', 'updated_at'
+        ]
+        read_only_fields = ['id', 'created_at', 'updated_at']

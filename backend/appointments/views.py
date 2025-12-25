@@ -596,3 +596,138 @@ def cancel_appointment_by_id(request, appointment_id):
             'success': False,
             'message': f'Lỗi server: {str(e)}'
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+# ===== DOCTOR DASHBOARD VIEWS (THÊM MỚI) =====
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_doctor_appointments(request, doctor_id):
+    """
+    API lấy danh sách lịch khám của bác sĩ (theo doctor_id)
+    Sắp xếp theo ngày khám và khung giờ
+    """
+    try:
+        doctor = Doctor.objects.get(id=doctor_id)
+    except Doctor.DoesNotExist:
+        return Response({
+            'success': False,
+            'message': 'Bác sĩ không tồn tại'
+        }, status=status.HTTP_404_NOT_FOUND)
+    
+    # Lấy tất cả lịch khám của bác sĩ, sắp xếp theo ngày và giờ
+    appointments = Appointment.objects.filter(doctor=doctor).select_related(
+        'patient__user', 'doctor__user'
+    ).order_by('appointment_date', 'time_slot')
+    
+    # SỬ DỤNG AppointmentDetailSerializer thay vì AppointmentSerializer
+    from .serializers import AppointmentDetailSerializer
+    serializer = AppointmentDetailSerializer(appointments, many=True)
+    return Response({
+        'success': True,
+        'data': serializer.data,
+        'count': appointments.count()
+    })
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def complete_appointment(request, pk):
+    """
+    API hoàn thành lịch khám - Cập nhật status, reason, notes
+    Sau khi cập nhật xong sẽ gọi webhook n8n
+    """
+    import requests
+    
+    appointment = get_object_or_404(Appointment, pk=pk)
+    
+    # Lấy dữ liệu từ request
+    new_reason = request.data.get('reason', appointment.reason)
+    new_notes = request.data.get('notes', appointment.notes)
+    n8n_webhook_url = request.data.get('webhook_url', '')  # URL webhook n8n từ frontend
+    
+    # Cập nhật appointment
+    appointment.status = Appointment.Status.COMPLETED
+    appointment.reason = new_reason
+    appointment.notes = new_notes
+    appointment.save()
+    
+    # Chuẩn bị dữ liệu gửi tới n8n
+    webhook_data = {
+        'appointment_id': appointment.id,
+        'patient': {
+            'id': appointment.patient.id,
+            'user_id': appointment.patient.user.id,
+            'full_name': appointment.patient.user.full_name,
+            'email': appointment.patient.user.email,
+            'phone': appointment.patient.user.phone,
+            'date_of_birth': str(appointment.patient.date_of_birth),
+            'gender': appointment.patient.gender,
+            'blood_type': appointment.patient.blood_type,
+            'address': appointment.patient.address,
+            'allergies': appointment.patient.allergies,
+            'emergency_contact': appointment.patient.emergency_contact,
+        },
+        'doctor': {
+            'id': appointment.doctor.id,
+            'full_name': appointment.doctor.user.full_name,
+            'specialization': appointment.doctor.specialization,
+        },
+        'appointment': {
+            'date': str(appointment.appointment_date),
+            'time_slot': appointment.time_slot,
+            'status': appointment.status,
+            'reason': appointment.reason,
+            'notes': appointment.notes,
+            'created_at': appointment.created_at.isoformat(),
+            'updated_at': appointment.updated_at.isoformat(),
+        }
+    }
+    
+    # Gọi webhook n8n (nếu có URL)
+    webhook_success = False
+    webhook_message = ''
+    if n8n_webhook_url:
+        try:
+            response = requests.post(n8n_webhook_url, json=webhook_data, timeout=10)
+            if response.status_code in [200, 201]:
+                webhook_success = True
+                webhook_message = 'Webhook đã được gọi thành công'
+            else:
+                webhook_message = f'Webhook trả về status {response.status_code}'
+        except requests.exceptions.RequestException as e:
+            webhook_message = f'Lỗi khi gọi webhook: {str(e)}'
+    else:
+        webhook_message = 'Không có webhook URL'
+    
+    # SỬ DỤNG AppointmentDetailSerializer để trả về đầy đủ thông tin
+    from .serializers import AppointmentDetailSerializer
+    response_data = AppointmentDetailSerializer(appointment).data
+    return Response({
+        'success': True,
+        'message': 'Hoàn thành lịch khám thành công',
+        'data': response_data,
+        'webhook': {
+            'success': webhook_success,
+            'message': webhook_message
+        }
+    })
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_appointment_detail(request, pk):
+    """
+    API lấy chi tiết 1 lịch khám (bao gồm đầy đủ thông tin patient)
+    Dùng cho trang chi tiết lịch khám của bác sĩ
+    """
+    appointment = get_object_or_404(Appointment.objects.select_related(
+        'patient__user', 'doctor__user'
+    ), pk=pk)
+    
+    from .serializers import AppointmentDetailSerializer
+    serializer = AppointmentDetailSerializer(appointment)
+    return Response({
+        'success': True,
+        'data': serializer.data
+    })
