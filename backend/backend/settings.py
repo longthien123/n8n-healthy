@@ -24,6 +24,7 @@ INSTALLED_APPS = [
     'users',
     'appointments',
     'n8n',
+    'feedback',  # THÊM MỚI: App quản lý feedback tasks
 ]
 
 MIDDLEWARE = [

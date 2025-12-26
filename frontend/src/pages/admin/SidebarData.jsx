@@ -27,6 +27,12 @@ const SidebarData = [
     icon: <FaIcons.FaUserNurse />,
     cName: "nav-text",
   },
+  {
+    title: "Feedback Tasks",
+    path: "/admin/feedback",
+    icon: <FaIcons.FaComments />,
+    cName: "nav-text",
+  },
 ];
 
 export default SidebarData
