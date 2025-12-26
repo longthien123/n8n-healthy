@@ -6,5 +6,5 @@ urlpatterns = [
     path('api/users/', include('users.urls')),
     path('api/appointments/', include('appointments.urls')),
     path('api/n8n/', include('n8n.urls')),
-
+    path('api/feedback/', include('feedback.urls')),  # THÊM MỚI: Feedback APIs
 ]

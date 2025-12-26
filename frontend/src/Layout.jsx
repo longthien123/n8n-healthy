@@ -20,6 +20,9 @@ import ActivationResult from "./components/ActivationResult"; // THÊM IMPORT
 // THÊM MỚI: Import trang Doctor Dashboard
 import DoctorDashboard from "./pages/doctor/DoctorDashboard";
 import AppointmentDetail from "./pages/doctor/AppointmentDetail";
+// THÊM MỚI: Import trang Feedback Tasks
+import FeedbackTasks from "./pages/admin/FeedbackTasks";
+import FeedbackDetail from "./pages/admin/FeedbackDetail";
 
 const  Layout = () => {
     
@@ -57,6 +60,9 @@ const  Layout = () => {
                 <Route path="doctor-schedule" element={<DoctorScheduleList />} />  
                 <Route path="add-doctor" element={<AddDoctor />} />  
                 <Route path="doctor/:id" element={<EditDoctor />} />  
+                {/* THÊM MỚI: Feedback Routes */}
+                <Route path="feedback" element={<FeedbackTasks />} />  
+                <Route path="feedback/:id" element={<FeedbackDetail />} />  
 
                 
                 
